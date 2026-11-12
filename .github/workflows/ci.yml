@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # WinUI 3 builds only on Windows.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build WinParted.sln -c Release
+
+      # Unit tests only. WinParted.Storage.IntegrationTests need administrator rights and create
+      # virtual disks, so they run on a developer PC (see README), never in CI.
+      - name: Unit tests
+        run: dotnet test tests/WinParted.Core.Tests -c Release --no-build --logger "trx;LogFileName=core-tests.trx" --results-directory test-results
+
+      - name: Publish self-contained build
+        run: dotnet publish src/WinParted.App -c Release -r win-x64 -o artifacts/WinParted-win-x64
+
+      # Without WinParted.pri the window fails to load (see the EnableMsixTooling note in the project file).
+      - name: Check the published build
+        shell: pwsh
+        run: |
+          foreach ($file in 'WinParted.exe', 'WinParted.pri') {
+            if (-not (Test-Path "artifacts/WinParted-win-x64/$file")) { throw "$file is missing from the published build" }
+          }
+          $exe = [System.IO.File]::ReadAllBytes("$PWD/artifacts/WinParted-win-x64/WinParted.exe")
+          if (-not ([System.Text.Encoding]::ASCII.GetString($exe).Contains('requireAdministrator'))) {
+            throw 'WinParted.exe does not ask for administrator rights'
+          }
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+          retention-days: 7
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinParted-win-x64
+          path: artifacts/WinParted-win-x64
+          retention-days: 7
