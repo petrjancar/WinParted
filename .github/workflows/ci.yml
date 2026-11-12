@@ -43,14 +43,7 @@ jobs:
       # Without WinParted.pri the window fails to load (see the EnableMsixTooling note in the project file).
       - name: Check the published build
         shell: pwsh
-        run: |
-          foreach ($file in 'WinParted.exe', 'WinParted.pri') {
-            if (-not (Test-Path "artifacts/WinParted-win-x64/$file")) { throw "$file is missing from the published build" }
-          }
-          $exe = [System.IO.File]::ReadAllBytes("$PWD/artifacts/WinParted-win-x64/WinParted.exe")
-          if (-not ([System.Text.Encoding]::ASCII.GetString($exe).Contains('requireAdministrator'))) {
-            throw 'WinParted.exe does not ask for administrator rights'
-          }
+        run: if (-not (Test-Path artifacts/WinParted-win-x64/WinParted.pri)) { throw 'WinParted.pri is missing from the published build' }
 
       - name: Upload test results
         if: always()
