@@ -4,9 +4,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/petrjancar)
 
-A free, open-source disk and partition manager for Windows 11, with a modern UI that explains what it's doing. Think GParted, but native to Windows and built for people who aren't storage experts.
+A free, open-source disk and partition manager for Windows 11 with a modern, native UI.
 
 > **Status:** early development. Use at your own risk.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/screenshot-dark.png">
+  <img alt="WinParted showing a disk's partition layout, the details of the selected volume and its available actions (sample data)" src="docs/images/screenshot-light.png">
+</picture>
 
 ## What it does (MVP)
 
@@ -60,7 +65,7 @@ the "needs administrator rights" screen, which makes that screen and sample mode
 dotnet run --project src/WinParted.App -- --sample
 ```
 
-Developer options: `--theme dark|light`, `--select <disk>[:<segment>]` (e.g. `--select 0:2`) and `--open <action>` (e.g. `--open ClearDisk`).
+Developer options: `--theme dark|light`, `--culture <name>` (number formatting, e.g. `en-US`), `--select <disk>[:<segment>]` (e.g. `--select 0:2`) and `--open <action>` (e.g. `--open ClearDisk`).
 
 Publish a self-contained release build (no .NET or Windows App SDK needed on the target PC):
 
