@@ -16,6 +16,11 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        if (Option("--culture") is { } culture)
+        {
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo(culture);
+            System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.DefaultThreadCurrentCulture;
+        }
         if (Option("--theme") is { } theme)
         {
             RequestedTheme = theme.Equals("dark", StringComparison.OrdinalIgnoreCase) ? ApplicationTheme.Dark : ApplicationTheme.Light;
@@ -44,7 +49,10 @@ public partial class App : Application
     /// <summary>Run with <c>--sample</c> to show the design's sample disks instead of real ones.</summary>
     public static bool IsSampleMode => Environment.GetCommandLineArgs().Skip(1).Any(a => a.Equals("--sample", StringComparison.OrdinalIgnoreCase));
 
-    /// <summary>Developer options: <c>--theme dark|light</c>, <c>--select disk[:segment]</c>.</summary>
+    /// <summary>
+    /// Developer options: <c>--theme dark|light</c>, <c>--culture name</c> (number formatting, e.g. en-US),
+    /// <c>--select disk[:segment]</c>, <c>--open action</c>.
+    /// </summary>
     private static string? Option(string name)
     {
         var args = Environment.GetCommandLineArgs();

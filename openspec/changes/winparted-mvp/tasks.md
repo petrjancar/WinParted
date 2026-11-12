@@ -19,7 +19,7 @@
 - [x] 3.1 Add `LICENSE` (MIT), `.gitignore` (Visual Studio), `.editorconfig` and `README.md` with project description, MVP scope, limitations (no partition moving, NTFS/ReFS resize only) and build instructions, stating Windows 11 as the minimum supported OS; verify README build steps work on a clean clone
 - [x] 3.2 Create `WinParted.sln` with `WinParted.App` (WinUI 3, unpackaged, self-contained, .NET 10), `WinParted.Core`, `WinParted.Storage`, `WinParted.Core.Tests`, `WinParted.Storage.IntegrationTests`; verify `dotnet build` succeeds
 - [x] 3.3 Add app manifest with `requireAdministrator` and confirm the app launches elevated with an empty window on Windows 11 (confirmed with the published Release build)
-- [ ] 3.4 Add GitHub Actions workflow building the solution and running `WinParted.Core.Tests` (integration category excluded); verify a green run
+- [x] 3.4 Add GitHub Actions workflow building the solution and running `WinParted.Core.Tests` (integration category excluded); verify a green run
 
 ## 4. Core snapshot model
 
