@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>WinParted contributors</Authors>
+    <Product>WinParted</Product>
+    <Copyright>Copyright (c) WinParted contributors</Copyright>
+    <!-- Windows 11 is the minimum supported OS. -->
+    <WinPartedWindowsTfm>net10.0-windows10.0.26100.0</WinPartedWindowsTfm>
+    <WinPartedMinWindows>10.0.22000.0</WinPartedMinWindows>
+  </PropertyGroup>
+</Project>

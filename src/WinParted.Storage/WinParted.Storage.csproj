@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- SMP (Windows Storage Management API) access via CIM. -->
+  <PropertyGroup>
+    <TargetFramework>$(WinPartedWindowsTfm)</TargetFramework>
+    <SupportedOSPlatformVersion>$(WinPartedMinWindows)</SupportedOSPlatformVersion>
+    <RootNamespace>WinParted.Storage</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Management.Infrastructure" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WinParted.Core\WinParted.Core.csproj" />
+  </ItemGroup>
+
+</Project>

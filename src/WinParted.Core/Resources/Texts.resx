@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Disabled-action reasons (docs/design/mvp-features.md section 7). {n} are placeholders. -->
+  <data name="Reason.OperationInProgress" xml:space="preserve"><value>Another operation is in progress. Wait for it to finish.</value></data>
+  <data name="Reason.TargetChanged" xml:space="preserve"><value>This disk was disconnected or changed. Nothing was modified.</value></data>
+  <data name="Reason.DiskReadOnly" xml:space="preserve"><value>This disk is write-protected. If it has a lock switch, turn it off.</value></data>
+  <data name="Reason.DynamicDisk" xml:space="preserve"><value>This is a dynamic disk. WinParted can't change dynamic disks. Use Disk Management.</value></data>
+  <data name="Reason.StorageSpaces" xml:space="preserve"><value>Managed by Storage Spaces. Use Storage Spaces in Settings to change it.</value></data>
+  <data name="Reason.DiskOffline" xml:space="preserve"><value>This disk is offline. Bring it online first.</value></data>
+  <data name="Reason.ProtectionUnknown" xml:space="preserve"><value>WinParted couldn't confirm this item is safe to change, so it's protected.</value></data>
+  <data name="Reason.SystemPartition" xml:space="preserve"><value>Windows needs this partition to start. Changing it could make your PC unbootable.</value></data>
+  <data name="Reason.MicrosoftReserved" xml:space="preserve"><value>Windows reserves this partition. It contains no files and must not be changed.</value></data>
+  <data name="Reason.RecoveryPartition" xml:space="preserve"><value>Windows uses this partition to repair itself.</value></data>
+  <data name="Reason.WindowsVolume" xml:space="preserve"><value>Windows is running from this volume.</value></data>
+  <data name="Reason.PagefileVolume" xml:space="preserve"><value>Windows uses this volume for virtual memory.</value></data>
+  <data name="Reason.BitLockerLocked" xml:space="preserve"><value>This volume is locked by BitLocker. Unlock it in File Explorer first.</value></data>
+  <data name="Reason.SystemDisk" xml:space="preserve"><value>Windows is installed on this disk.</value></data>
+  <data name="Reason.ExtendBlockedByPartition" xml:space="preserve"><value>{0} can only grow into free space directly after it. The {1} partition is in the way.</value></data>
+  <data name="Reason.ExtendFreeSpaceOnlyBefore" xml:space="preserve"><value>A volume can only grow into free space after it. Moving partitions isn't supported.</value></data>
+  <data name="Reason.ExtendNoFreeSpace" xml:space="preserve"><value>There's no unallocated space after {0}.</value></data>
+  <data name="Reason.ResizeUnsupportedFileSystem" xml:space="preserve"><value>Only NTFS and ReFS volumes can be resized. This volume is {0}.</value></data>
+  <data name="Reason.ShrinkAtMinimum" xml:space="preserve"><value>This volume can't be made any smaller right now.</value></data>
+  <data name="Reason.ResizeNeedsFormat" xml:space="preserve"><value>Format this partition before resizing it.</value></data>
+  <data name="Reason.AlreadyInitialized" xml:space="preserve"><value>This disk is already set up. To start over, use Clear disk.</value></data>
+  <data name="Reason.DiskAlreadyEmpty" xml:space="preserve"><value>This disk is already empty.</value></data>
+  <data name="Reason.MbrPartitionLimit" xml:space="preserve"><value>MBR disks are limited to four primary partitions.</value></data>
+  <data name="Reason.UnreadablePartition" xml:space="preserve"><value>Windows can't read this partition. You can only delete it.</value></data>
+  <data name="Reason.NeedsFormatFirst" xml:space="preserve"><value>Format this partition first.</value></data>
+  <data name="Reason.AllDriveLettersInUse" xml:space="preserve"><value>All drive letters are in use.</value></data>
+  <data name="Reason.Fat32TooLarge" xml:space="preserve"><value>WinParted formats FAT32 up to 32 GB, like Windows does. Use exFAT for larger drives.</value></data>
+  <data name="Reason.FullFormatNotOnVirtualDisk" xml:space="preserve"><value>Windows can't do a full NTFS format on a virtual disk. Quick format works.</value></data>
+  <data name="Reason.LabelTooLong" xml:space="preserve"><value>{0} labels can be at most {1} characters.</value></data>
+  <data name="Reason.LabelInvalidCharacters" xml:space="preserve"><value>{0} labels can't contain {1} or quotes.</value></data>
+
+  <!-- Operation failures (mvp-features.md section 8.1). Each says what happened, whether anything changed, and what to do. -->
+  <data name="Error.NotSupported" xml:space="preserve"><value>Windows doesn't support this operation on this disk. Nothing was changed.</value></data>
+  <data name="Error.InvalidParameter" xml:space="preserve"><value>Windows rejected one of the settings. Nothing was changed. Check the values and try again.</value></data>
+  <data name="Error.SizeNotSupported" xml:space="preserve"><value>Windows couldn't resize the volume to that size. Nothing was changed. Try a smaller change.</value></data>
+  <data name="Error.NotEnoughSpace" xml:space="preserve"><value>There isn't enough free space for that size. Nothing was changed. Try a smaller size.</value></data>
+  <data name="Error.AccessDenied" xml:space="preserve"><value>Windows denied access to this disk. Nothing was changed.</value></data>
+  <data name="Error.NotInitialized" xml:space="preserve"><value>This disk isn't set up yet. Nothing was changed. Initialize it first.</value></data>
+  <data name="Error.AlreadyInitialized" xml:space="preserve"><value>This disk is already set up. Nothing was changed.</value></data>
+  <data name="Error.ReadOnly" xml:space="preserve"><value>This disk is write-protected. Nothing was changed.</value></data>
+  <data name="Error.PartitionLimit" xml:space="preserve"><value>This disk can't hold more partitions. Nothing was changed.</value></data>
+  <data name="Error.FullFormatNotSupported" xml:space="preserve"><value>Windows can't do a full format here. Nothing was changed. Use quick format instead.</value></data>
+  <data name="Error.CreatedButFormatFailed" xml:space="preserve"><value>The partition was created, but formatting failed. It's shown as Unformatted. You can try formatting it again.</value></data>
+  <data name="Error.DiskRemoved" xml:space="preserve"><value>The disk was disconnected during the operation. It may have been partly changed. Connect it again to see its current state.</value></data>
+  <data name="Error.DiskRemovedDuringFormat" xml:space="preserve"><value>The disk was disconnected during the format. The volume may be incomplete. Connect the disk again and format it again.</value></data>
+  <data name="Error.Unknown" xml:space="preserve"><value>Something went wrong and Windows didn't say why. The disk may have been partly changed. Refresh to see its current state.</value></data>
+
+  <!-- Lock badge role descriptions (mvp-features.md section 5). -->
+  <data name="Role.EfiSystem" xml:space="preserve"><value>EFI System - Windows needs this to start</value></data>
+  <data name="Role.MicrosoftReserved" xml:space="preserve"><value>Microsoft Reserved - used by Windows, contains no files</value></data>
+  <data name="Role.Recovery" xml:space="preserve"><value>Recovery - Windows uses this to repair itself</value></data>
+  <data name="Role.SystemPartition" xml:space="preserve"><value>System partition - Windows needs this to start</value></data>
+  <data name="Role.WindowsVolume" xml:space="preserve"><value>Windows is installed here</value></data>
+  <data name="Role.PagefileVolume" xml:space="preserve"><value>Windows uses this volume for virtual memory</value></data>
+  <data name="Role.BitLockerLocked" xml:space="preserve"><value>Locked by BitLocker</value></data>
+  <data name="Role.ProtectionUnknown" xml:space="preserve"><value>Protected - WinParted couldn't confirm it's safe to change</value></data>
+  <data name="Role.SystemDisk" xml:space="preserve"><value>System disk - Windows is installed on this disk</value></data>
+  <data name="Role.DynamicDisk" xml:space="preserve"><value>Dynamic disk - managed by Disk Management</value></data>
+  <data name="Role.StorageSpaces" xml:space="preserve"><value>Managed by Storage Spaces</value></data>
+  <data name="Role.ReadOnlyDisk" xml:space="preserve"><value>This disk is write-protected</value></data>
+
+  <!-- Segment titles for partitions without a label or drive letter. -->
+  <data name="Type.EfiSystem" xml:space="preserve"><value>EFI System</value></data>
+  <data name="Type.MicrosoftReserved" xml:space="preserve"><value>Microsoft Reserved</value></data>
+  <data name="Type.Recovery" xml:space="preserve"><value>Recovery</value></data>
+  <data name="Type.DynamicDisk" xml:space="preserve"><value>Dynamic disk data</value></data>
+  <data name="Type.StorageSpaces" xml:space="preserve"><value>Storage Spaces</value></data>
+  <data name="Type.Unformatted" xml:space="preserve"><value>Unformatted</value></data>
+  <data name="Type.UnknownFileSystem" xml:space="preserve"><value>Unknown filesystem</value></data>
+  <data name="Type.Partition" xml:space="preserve"><value>Partition {0}</value></data>
+
+  <!-- File system names. -->
+  <data name="FileSystem.None" xml:space="preserve"><value>no file system</value></data>
+  <data name="FileSystem.Ntfs" xml:space="preserve"><value>NTFS</value></data>
+  <data name="FileSystem.ReFS" xml:space="preserve"><value>ReFS</value></data>
+  <data name="FileSystem.Fat" xml:space="preserve"><value>FAT</value></data>
+  <data name="FileSystem.Fat32" xml:space="preserve"><value>FAT32</value></data>
+  <data name="FileSystem.ExFat" xml:space="preserve"><value>exFAT</value></data>
+  <data name="FileSystem.Udf" xml:space="preserve"><value>UDF</value></data>
+  <data name="FileSystem.Csvfs" xml:space="preserve"><value>CSVFS</value></data>
+  <data name="FileSystem.Other" xml:space="preserve"><value>an unknown file system</value></data>
+
+  <!-- Main window texts (mvp-features.md sections 3-5). -->
+  <data name="Ui.DiskTitle" xml:space="preserve"><value>Disk {0}</value></data>
+  <data name="Ui.Copied" xml:space="preserve"><value>Copied</value></data>
+  <data name="Ui.Chip.SystemDisk" xml:space="preserve"><value>System disk</value></data>
+  <data name="Ui.Chip.Offline" xml:space="preserve"><value>Offline</value></data>
+  <data name="Ui.Chip.NotInitialized" xml:space="preserve"><value>Not initialized</value></data>
+  <data name="Ui.Chip.ReadOnly" xml:space="preserve"><value>Read-only</value></data>
+  <data name="Ui.Chip.Managed" xml:space="preserve"><value>Managed by Windows</value></data>
+  <data name="Ui.Chip.Online" xml:space="preserve"><value>Online</value></data>
+  <data name="Ui.Chip.Busy" xml:space="preserve"><value>Busy</value></data>
+  <data name="Ui.Chip.Encrypted" xml:space="preserve"><value>Encrypted</value></data>
+  <data name="Ui.Health.Healthy" xml:space="preserve"><value>Healthy</value></data>
+  <data name="Ui.Health.Warning" xml:space="preserve"><value>Warning</value></data>
+  <data name="Ui.Health.Unhealthy" xml:space="preserve"><value>Unhealthy</value></data>
+  <data name="Ui.Health.Unknown" xml:space="preserve"><value>Health unknown</value></data>
+  <data name="Ui.Style.Gpt" xml:space="preserve"><value>GPT</value></data>
+  <data name="Ui.Style.Mbr" xml:space="preserve"><value>MBR</value></data>
+  <data name="Ui.Style.Uninitialized" xml:space="preserve"><value>Not initialized</value></data>
+  <data name="Ui.Bus.Unknown" xml:space="preserve"><value>Unknown bus</value></data>
+  <data name="Ui.Bus.Ata" xml:space="preserve"><value>ATA</value></data>
+  <data name="Ui.Bus.Sata" xml:space="preserve"><value>SATA</value></data>
+  <data name="Ui.Bus.Sas" xml:space="preserve"><value>SAS</value></data>
+  <data name="Ui.Bus.Scsi" xml:space="preserve"><value>SCSI</value></data>
+  <data name="Ui.Bus.Nvme" xml:space="preserve"><value>NVMe</value></data>
+  <data name="Ui.Bus.Usb" xml:space="preserve"><value>USB</value></data>
+  <data name="Ui.Bus.Sd" xml:space="preserve"><value>SD</value></data>
+  <data name="Ui.Bus.Mmc" xml:space="preserve"><value>MMC</value></data>
+  <data name="Ui.Bus.Virtual" xml:space="preserve"><value>Virtual</value></data>
+  <data name="Ui.Bus.Raid" xml:space="preserve"><value>RAID</value></data>
+  <data name="Ui.Bus.StorageSpaces" xml:space="preserve"><value>Storage Spaces</value></data>
+  <data name="Ui.Bus.Other" xml:space="preserve"><value>Other</value></data>
+  <data name="Ui.Segment.Unallocated" xml:space="preserve"><value>Unallocated</value></data>
+  <data name="Ui.Segment.NotPartitioned" xml:space="preserve"><value>Not partitioned</value></data>
+  <data name="Ui.Segment.Protected" xml:space="preserve"><value>Protected</value></data>
+  <data name="Ui.Segment.Unreadable" xml:space="preserve"><value>Contents unreadable</value></data>
+  <data name="Ui.Segment.NoFileSystem" xml:space="preserve"><value>No file system</value></data>
+  <data name="Ui.Segment.Used" xml:space="preserve"><value>{0} used · {1}%</value></data>
+  <data name="Ui.Segment.LockedBitLocker" xml:space="preserve"><value>Locked by BitLocker</value></data>
+  <data name="Ui.Segment.Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Ui.Segment.Protected.Suffix" xml:space="preserve"><value>protected</value></data>
+  <data name="Ui.Role.Volume" xml:space="preserve"><value>A regular volume for your files.</value></data>
+  <data name="Ui.Role.Unformatted" xml:space="preserve"><value>This partition has no file system yet.</value></data>
+  <data name="Ui.Role.Foreign" xml:space="preserve"><value>Windows can't read this partition. It may be used by Linux or another operating system.</value></data>
+  <data name="Ui.Role.Unallocated" xml:space="preserve"><value>Space on the disk that no partition uses.</value></data>
+  <data name="Ui.Role.Disk" xml:space="preserve"><value>Select a partition in the layout to see its details.</value></data>
+  <data name="Ui.Hint.Unallocated" xml:space="preserve"><value>You can create a new partition here.</value></data>
+  <data name="Ui.Detail.Partition" xml:space="preserve"><value>Partition</value></data>
+  <data name="Ui.Detail.Type" xml:space="preserve"><value>Type</value></data>
+  <data name="Ui.Detail.StartsAt" xml:space="preserve"><value>Starts at</value></data>
+  <data name="Ui.Detail.Size" xml:space="preserve"><value>Size</value></data>
+  <data name="Ui.Detail.FileSystem" xml:space="preserve"><value>File system</value></data>
+  <data name="Ui.Detail.Label" xml:space="preserve"><value>Label</value></data>
+  <data name="Ui.Detail.DriveLetter" xml:space="preserve"><value>Drive letter</value></data>
+  <data name="Ui.Detail.MountPaths" xml:space="preserve"><value>Mount paths</value></data>
+  <data name="Ui.Detail.Used" xml:space="preserve"><value>Used</value></data>
+  <data name="Ui.Detail.Free" xml:space="preserve"><value>Free</value></data>
+  <data name="Ui.Detail.BusType" xml:space="preserve"><value>Bus type</value></data>
+  <data name="Ui.Detail.PartitionStyle" xml:space="preserve"><value>Partition style</value></data>
+  <data name="Ui.Detail.Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Ui.Detail.Health" xml:space="preserve"><value>Health</value></data>
+  <data name="Ui.Detail.UniqueId" xml:space="preserve"><value>Unique ID</value></data>
+  <data name="Ui.Detail.SerialNumber" xml:space="preserve"><value>Serial number</value></data>
+  <data name="Ui.Detail.SectorSize" xml:space="preserve"><value>Sector size</value></data>
+  <data name="Ui.Detail.Location" xml:space="preserve"><value>Location</value></data>
+  <data name="Ui.Detail.Partitions" xml:space="preserve"><value>Partitions</value></data>
+  <data name="Ui.Detail.Unallocated" xml:space="preserve"><value>Unallocated</value></data>
+  <data name="Ui.Detail.OfflineReason" xml:space="preserve"><value>Offline reason</value></data>
+  <data name="Ui.Value.NoDriveLetter" xml:space="preserve"><value>No drive letter</value></data>
+  <data name="Ui.Value.None" xml:space="preserve"><value>None</value></data>
+  <data name="Ui.Value.Online" xml:space="preserve"><value>Online</value></data>
+  <data name="Ui.Value.Offline" xml:space="preserve"><value>Offline</value></data>
+  <data name="Ui.Value.Bytes" xml:space="preserve"><value>{0} bytes</value></data>
+  <data name="Ui.Flag.System" xml:space="preserve"><value>System</value></data>
+  <data name="Ui.Flag.Boot" xml:space="preserve"><value>Boot</value></data>
+  <data name="Ui.Flag.Hidden" xml:space="preserve"><value>Hidden</value></data>
+  <data name="Ui.Flag.Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Ui.Flag.ReadOnly" xml:space="preserve"><value>Read-only</value></data>
+  <data name="Ui.Flag.Encrypted" xml:space="preserve"><value>Encrypted</value></data>
+  <data name="Ui.Flag.Locked" xml:space="preserve"><value>Locked by BitLocker</value></data>
+  <data name="Ui.Type.Gpt" xml:space="preserve"><value>{0} (GPT)</value></data>
+  <data name="Ui.Type.Mbr" xml:space="preserve"><value>{0} (MBR 0x{1:X2})</value></data>
+  <data name="Ui.Type.BasicData" xml:space="preserve"><value>Basic data</value></data>
+  <data name="Ui.Type.Primary" xml:space="preserve"><value>Primary</value></data>
+  <data name="Ui.Type.ExtendedLogical" xml:space="preserve"><value>Logical</value></data>
+  <data name="Ui.Type.Other" xml:space="preserve"><value>Other</value></data>
+  <data name="Ui.Action.Initialize" xml:space="preserve"><value>Initialize</value></data>
+  <data name="Ui.Action.BringOnline" xml:space="preserve"><value>Bring online</value></data>
+  <data name="Ui.Action.TakeOffline" xml:space="preserve"><value>Take offline</value></data>
+  <data name="Ui.Action.ClearDisk" xml:space="preserve"><value>Clear disk</value></data>
+  <data name="Ui.Action.CreatePartition" xml:space="preserve"><value>Create partition</value></data>
+  <data name="Ui.Action.FormatVolume" xml:space="preserve"><value>Format</value></data>
+  <data name="Ui.Action.DeletePartition" xml:space="preserve"><value>Delete</value></data>
+  <data name="Ui.Action.ShrinkVolume" xml:space="preserve"><value>Shrink</value></data>
+  <data name="Ui.Action.ExtendVolume" xml:space="preserve"><value>Extend</value></data>
+  <data name="Ui.Action.ChangeDriveLetter" xml:space="preserve"><value>Change drive letter</value></data>
+  <data name="Ui.Action.ChangeLabel" xml:space="preserve"><value>Change label</value></data>
+  <data name="Ui.Group.Disk" xml:space="preserve"><value>Disk</value></data>
+  <data name="Ui.Group.NewPartition" xml:space="preserve"><value>New partition</value></data>
+  <data name="Ui.Group.Contents" xml:space="preserve"><value>Contents</value></data>
+  <data name="Ui.Group.Size" xml:space="preserve"><value>Size</value></data>
+  <data name="Ui.Group.NameAndLetter" xml:space="preserve"><value>Name and drive letter</value></data>
+  <data name="Ui.ReasonSummary" xml:space="preserve"><value>{0}: {1}</value></data>
+  <data name="Ui.ListAnd" xml:space="preserve"><value>{0} and {1}</value></data>
+  <data name="Ui.Toast.Connected" xml:space="preserve"><value>{0} disk connected: {1} ({2})</value></data>
+  <data name="Ui.Toast.Disconnected" xml:space="preserve"><value>Disk {0} was disconnected</value></data>
+  <data name="Ui.Toast.SelectedDisconnected" xml:space="preserve"><value>Disk {0} was disconnected. Showing Disk {1} instead.</value></data>
+  <data name="Ui.Action.Actions" xml:space="preserve"><value>Actions</value></data>
+  <data name="Ui.Bar.NotToScale" xml:space="preserve"><value>Small partitions are enlarged so you can select them (not to scale)</value></data>
+  <data name="Ui.Action.DiskActions" xml:space="preserve"><value>Disk actions</value></data>
+
+  <!-- Dialogs, progress and results (mvp-features.md sections 6 and 8). -->
+  <data name="Dlg.Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Dlg.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="Dlg.Identity" xml:space="preserve"><value>{0} · {1} · {2}</value></data>
+  <data name="Dlg.Initialize.Title" xml:space="preserve"><value>Initialize Disk {0}?</value></data>
+  <data name="Dlg.Initialize.Primary" xml:space="preserve"><value>Initialize</value></data>
+  <data name="Dlg.Initialize.Style" xml:space="preserve"><value>Partition style</value></data>
+  <data name="Dlg.Initialize.Gpt" xml:space="preserve"><value>GPT (recommended)</value></data>
+  <data name="Dlg.Initialize.GptHint" xml:space="preserve"><value>Works with all modern PCs and disks larger than 2 TB.</value></data>
+  <data name="Dlg.Initialize.Mbr" xml:space="preserve"><value>MBR</value></data>
+  <data name="Dlg.Initialize.MbrHint" xml:space="preserve"><value>Only needed for very old PCs or devices that don't support GPT. Limited to 2 TB and four partitions.</value></data>
+  <data name="Dlg.Initialize.MbrWarning" xml:space="preserve"><value>With MBR, only the first 2 TB of this {0} disk can be used.</value></data>
+  <data name="Dlg.Initialize.GptResult" xml:space="preserve"><value>Windows adds a 16 MB Microsoft Reserved partition at the start. The rest stays unallocated, ready for new partitions.</value></data>
+  <data name="Dlg.Initialize.MbrResult" xml:space="preserve"><value>With MBR no reserved partition is added. The usable space becomes one unallocated region.</value></data>
+  <data name="Dlg.Offline.Title" xml:space="preserve"><value>Take Disk {0} offline?</value></data>
+  <data name="Dlg.Offline.Primary" xml:space="preserve"><value>Take offline</value></data>
+  <data name="Dlg.Offline.Body" xml:space="preserve"><value>Its volumes ({0}) won't be available in Windows until you bring the disk online again. No data is deleted.</value></data>
+  <data name="Dlg.Offline.BodyNoVolumes" xml:space="preserve"><value>Windows won't use this disk until you bring it online again. No data is deleted.</value></data>
+  <data name="Dlg.Clear.Title" xml:space="preserve"><value>Clear Disk {0}?</value></data>
+  <data name="Dlg.Clear.Primary" xml:space="preserve"><value>Clear disk</value></data>
+  <data name="Dlg.Clear.Warning" xml:space="preserve"><value>All partitions and files on this disk will be erased. This cannot be undone.</value></data>
+  <data name="Dlg.Clear.Confirm" xml:space="preserve"><value>Type {0} to confirm:</value></data>
+  <data name="Dlg.Create.Title" xml:space="preserve"><value>Create partition on Disk {0}</value></data>
+  <data name="Dlg.Create.Subtitle" xml:space="preserve"><value>{0} · in {1} of unallocated space</value></data>
+  <data name="Dlg.Create.Primary" xml:space="preserve"><value>Create</value></data>
+  <data name="Dlg.Create.Format" xml:space="preserve"><value>Format</value></data>
+  <data name="Dlg.Create.DontFormat" xml:space="preserve"><value>Don't format</value></data>
+  <data name="Dlg.Create.DontFormatHint" xml:space="preserve"><value>Creates an empty partition with no file system and no drive letter. It shows as Unformatted.</value></data>
+  <data name="Dlg.Create.NewPartition" xml:space="preserve"><value>New partition</value></data>
+  <data name="Dlg.Create.StaysFree" xml:space="preserve"><value>Stays unallocated</value></data>
+  <data name="Dlg.Size" xml:space="preserve"><value>Size</value></data>
+  <data name="Dlg.Range" xml:space="preserve"><value>{0} to {1}</value></data>
+  <data name="Dlg.SizeTooLarge" xml:space="preserve"><value>The free space is {0}. Enter {0} or less.</value></data>
+  <data name="Dlg.SizeTooSmall" xml:space="preserve"><value>Enter at least 1 MB.</value></data>
+  <data name="Dlg.SizeOutOfRange" xml:space="preserve"><value>Enter a size between {0} and {1}.</value></data>
+  <data name="Dlg.SizeInvalid" xml:space="preserve"><value>Enter a number.</value></data>
+  <data name="Dlg.FileSystem" xml:space="preserve"><value>File system</value></data>
+  <data name="Dlg.Label" xml:space="preserve"><value>Volume label</value></data>
+  <data name="Dlg.LabelPlaceholder" xml:space="preserve"><value>Optional</value></data>
+  <data name="Dlg.DriveLetter" xml:space="preserve"><value>Drive letter</value></data>
+  <data name="Dlg.NoDriveLetter" xml:space="preserve"><value>No drive letter</value></data>
+  <data name="Dlg.QuickFormat" xml:space="preserve"><value>Quick format</value></data>
+  <data name="Dlg.FullFormatHint" xml:space="preserve"><value>A full format checks the whole partition for errors. It can take a long time and can't be stopped once started.</value></data>
+  <data name="Dlg.AllocationUnit" xml:space="preserve"><value>Allocation unit size</value></data>
+  <data name="Dlg.AllocationDefault" xml:space="preserve"><value>Default (recommended)</value></data>
+  <data name="Dlg.ProgramsWarning" xml:space="preserve"><value>Programs using {0} will lose access to it and may lose unsaved work. Close them first.</value></data>
+  <data name="Dlg.Delete.Title" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="Dlg.Delete.TitleForeign" xml:space="preserve"><value>Delete {0} partition on Disk {1}?</value></data>
+  <data name="Dlg.Delete.Primary" xml:space="preserve"><value>Delete</value></data>
+  <data name="Dlg.Delete.Body" xml:space="preserve"><value>All files on {0} on Disk {1} will be permanently erased{2}. The space will become unallocated.</value></data>
+  <data name="Dlg.Delete.BodyUnformatted" xml:space="preserve"><value>{0} on Disk {1} will be deleted. The space will become unallocated.</value></data>
+  <data name="Dlg.UsedSuffix" xml:space="preserve"><value> ({0} used)</value></data>
+  <data name="Dlg.Delete.Foreign" xml:space="preserve"><value>Windows can't read this partition (it may be used by Linux or another operating system). Its contents will be permanently erased.</value></data>
+  <data name="Dlg.Delete.ForeignNote" xml:space="preserve"><value>The space will become unallocated. If you dual-boot, the other system may stop starting.</value></data>
+  <data name="Dlg.Format.Title" xml:space="preserve"><value>Format {0}?</value></data>
+  <data name="Dlg.Format.Primary" xml:space="preserve"><value>Format</value></data>
+  <data name="Dlg.Format.Body" xml:space="preserve"><value>All files on {0} will be erased{1}.</value></data>
+  <data name="Dlg.Format.KeepsLetter" xml:space="preserve"><value>The drive letter {0} is kept.</value></data>
+  <data name="Dlg.Shrink.Title" xml:space="preserve"><value>Shrink {0}</value></data>
+  <data name="Dlg.Shrink.Primary" xml:space="preserve"><value>Shrink</value></data>
+  <data name="Dlg.Shrink.Current" xml:space="preserve"><value>Current size</value></data>
+  <data name="Dlg.Shrink.Used" xml:space="preserve"><value>Used</value></data>
+  <data name="Dlg.Shrink.Smallest" xml:space="preserve"><value>Smallest possible</value></data>
+  <data name="Dlg.Shrink.Calculating" xml:space="preserve"><value>Calculating the smallest possible size…</value></data>
+  <data name="Dlg.Shrink.CalculatingHint" xml:space="preserve"><value>On a large volume Windows can take up to 30 seconds.</value></data>
+  <data name="Dlg.NewSize" xml:space="preserve"><value>New size</value></data>
+  <data name="Dlg.Shrink.Frees" xml:space="preserve"><value>frees {0}</value></data>
+  <data name="Dlg.Shrink.Result" xml:space="preserve"><value>The freed space appears directly after {0}.</value></data>
+  <data name="Dlg.Shrink.MinimumExplained" xml:space="preserve"><value>Windows can't move some system files (like the pagefile or hibernation file), so this volume can't be made smaller than {0} right now.</value></data>
+  <data name="Dlg.Shrink.Slow" xml:space="preserve"><value>Shrinking can take several minutes and can't be stopped once started.</value></data>
+  <data name="Dlg.Shrink.Failed" xml:space="preserve"><value>Windows couldn't report the smallest size. Try again later.</value></data>
+  <data name="Dlg.Extend.Title" xml:space="preserve"><value>Extend {0}</value></data>
+  <data name="Dlg.Extend.Primary" xml:space="preserve"><value>Extend</value></data>
+  <data name="Dlg.Extend.FreeAfter" xml:space="preserve"><value>Free space after it</value></data>
+  <data name="Dlg.Extend.Result" xml:space="preserve"><value>{0} grows from {1} to {2}.</value></data>
+  <data name="Dlg.Letter.Title" xml:space="preserve"><value>Change drive letter for {0}</value></data>
+  <data name="Dlg.Letter.Current" xml:space="preserve"><value>{0} (current)</value></data>
+  <data name="Dlg.Letter.Primary" xml:space="preserve"><value>Change</value></data>
+  <data name="Dlg.Letter.Remove" xml:space="preserve"><value>Remove letter</value></data>
+  <data name="Dlg.Letter.ChangeWarning" xml:space="preserve"><value>Programs and shortcuts that use {0} may need to be updated.</value></data>
+  <data name="Dlg.Letter.RemoveWarning" xml:space="preserve"><value>Programs and shortcuts that use {0} may stop working. The files on the volume are not affected.</value></data>
+  <data name="Dlg.Letter.Assign" xml:space="preserve"><value>Assign</value></data>
+  <data name="Dlg.LabelDlg.Title" xml:space="preserve"><value>Change label for {0}</value></data>
+  <data name="Dlg.LabelDlg.Count" xml:space="preserve"><value>{0} · {1} of {2} characters</value></data>
+  <data name="Dlg.LabelDlg.Primary" xml:space="preserve"><value>Save</value></data>
+  <data name="Busy.Initialize" xml:space="preserve"><value>Initializing Disk {0}</value></data>
+  <data name="Busy.BringOnline" xml:space="preserve"><value>Bringing Disk {0} online</value></data>
+  <data name="Busy.TakeOffline" xml:space="preserve"><value>Taking Disk {0} offline</value></data>
+  <data name="Busy.ClearDisk" xml:space="preserve"><value>Clearing Disk {0}</value></data>
+  <data name="Busy.CreatePartition" xml:space="preserve"><value>Creating a partition on Disk {0}</value></data>
+  <data name="Busy.DeletePartition" xml:space="preserve"><value>Deleting {0}</value></data>
+  <data name="Busy.FormatVolume" xml:space="preserve"><value>Formatting {0}</value></data>
+  <data name="Busy.ShrinkVolume" xml:space="preserve"><value>Shrinking {0}</value></data>
+  <data name="Busy.ExtendVolume" xml:space="preserve"><value>Extending {0}</value></data>
+  <data name="Busy.ChangeDriveLetter" xml:space="preserve"><value>Changing the drive letter of {0}</value></data>
+  <data name="Busy.ChangeLabel" xml:space="preserve"><value>Renaming {0}</value></data>
+  <data name="Busy.Hint" xml:space="preserve"><value>You can keep browsing. Other changes are paused until this finishes.</value></data>
+  <data name="Busy.NoProgress" xml:space="preserve"><value>Windows doesn't report progress for this step.</value></data>
+  <data name="Done.Initialize" xml:space="preserve"><value>Disk {0} was initialized as {1}. You can now create partitions.</value></data>
+  <data name="Done.BringOnline" xml:space="preserve"><value>Disk {0} is online.</value></data>
+  <data name="Done.TakeOffline" xml:space="preserve"><value>Disk {0} is offline.</value></data>
+  <data name="Done.ClearDisk" xml:space="preserve"><value>Disk {0} was cleared. It's empty.</value></data>
+  <data name="Done.CreatePartition" xml:space="preserve"><value>A new partition was created on Disk {0}.</value></data>
+  <data name="Done.DeletePartition" xml:space="preserve"><value>{0} was deleted.</value></data>
+  <data name="Done.FormatVolume" xml:space="preserve"><value>{0} was formatted as {1}.</value></data>
+  <data name="Done.ShrinkVolume" xml:space="preserve"><value>{0} was shrunk to {1}. The freed space is now unallocated after it.</value></data>
+  <data name="Done.ExtendVolume" xml:space="preserve"><value>{0} was extended to {1}.</value></data>
+  <data name="Done.ChangeDriveLetter" xml:space="preserve"><value>The volume now uses {0}.</value></data>
+  <data name="Done.RemoveDriveLetter" xml:space="preserve"><value>The volume no longer has a drive letter.</value></data>
+  <data name="Done.ChangeLabel" xml:space="preserve"><value>The volume is now called {0}.</value></data>
+  <data name="Done.InitializeNow" xml:space="preserve"><value>Initialize now</value></data>
+  <data name="Close.Title" xml:space="preserve"><value>An operation is still running</value></data>
+  <data name="Close.Body" xml:space="preserve"><value>{0} is still in progress. Closing WinParted will not stop it. Windows will finish it in the background, but you won't see the result here.</value></data>
+  <data name="Close.Keep" xml:space="preserve"><value>Keep WinParted open</value></data>
+  <data name="Close.Anyway" xml:space="preserve"><value>Close anyway</value></data>
+  <data name="Fail.Title" xml:space="preserve"><value>{0} failed</value></data>
+  <data name="Fail.WhatHappened" xml:space="preserve"><value>What happened</value></data>
+  <data name="Fail.Changed" xml:space="preserve"><value>Was anything changed?</value></data>
+  <data name="Fail.ChangedNo" xml:space="preserve"><value>No. Nothing was changed.</value></data>
+  <data name="Fail.ChangedMaybe" xml:space="preserve"><value>Maybe. The disk may have been partly changed.</value></data>
+  <data name="Fail.WhatToDo" xml:space="preserve"><value>What you can do</value></data>
+  <data name="Fail.WhatToDoText" xml:space="preserve"><value>Refresh to see the disk's current state. Technical details can help if you report a problem.</value></data>
+  <data name="Fail.Details" xml:space="preserve"><value>Technical details</value></data>
+  <data name="Fail.Copy" xml:space="preserve"><value>Copy details</value></data>
+  <data name="Fail.Refresh" xml:space="preserve"><value>Refresh</value></data>
+  <data name="Dlg.Create.FormatHint" xml:space="preserve"><value>The new partition gets a file system and a drive letter, so it's ready to use.</value></data>
+  <data name="Reason.RemovableMediaOffline" xml:space="preserve"><value>Windows can't take removable media, like USB flash drives, offline.</value></data>
+  <data name="Dlg.UseMaximum" xml:space="preserve"><value>Maximum</value></data>
+  <data name="Dlg.UseSmallest" xml:space="preserve"><value>Smallest</value></data>
+</root>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WinParted brushes from the design's Tokens board. Everything else uses WinUI theme resources. -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="SegmentUsedBrush" Color="#B4D3F0" />
+            <SolidColorBrush x:Key="SegmentFreeBrush" Color="#E8F2FB" />
+            <SolidColorBrush x:Key="SegmentStrokeBrush" Color="#6C9FCF" />
+            <SolidColorBrush x:Key="SegmentProtectedBrush" Color="#EBEBEB" />
+            <SolidColorBrush x:Key="SegmentProtectedStrokeBrush" Color="#D1D1D1" />
+            <SolidColorBrush x:Key="SegmentUnknownBrush" Color="#EEE8F5" />
+            <SolidColorBrush x:Key="SegmentUnknownStrokeBrush" Color="#9B84C0" />
+            <SolidColorBrush x:Key="UnallocatedHatchBrush" Color="#BDBDBD" />
+            <SolidColorBrush x:Key="UnallocatedStrokeBrush" Color="#707070" />
+            <SolidColorBrush x:Key="MiniVolumeBrush" Color="#3A86C8" />
+            <SolidColorBrush x:Key="MiniSystemBrush" Color="#9A9A9A" />
+            <SolidColorBrush x:Key="MiniUnknownBrush" Color="#8B6BB5" />
+            <SolidColorBrush x:Key="ChipWarningBackgroundBrush" Color="#FFF4CE" />
+            <SolidColorBrush x:Key="ChipCriticalBackgroundBrush" Color="#FDE7E9" />
+            <SolidColorBrush x:Key="ChipAccentBackgroundBrush" Color="#E5F0FA" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="SegmentUsedBrush" Color="#2A5A84" />
+            <SolidColorBrush x:Key="SegmentFreeBrush" Color="#1A2C3C" />
+            <SolidColorBrush x:Key="SegmentStrokeBrush" Color="#4D86B8" />
+            <SolidColorBrush x:Key="SegmentProtectedBrush" Color="#3A3A3A" />
+            <SolidColorBrush x:Key="SegmentProtectedStrokeBrush" Color="#4B4B4B" />
+            <SolidColorBrush x:Key="SegmentUnknownBrush" Color="#3A3147" />
+            <SolidColorBrush x:Key="SegmentUnknownStrokeBrush" Color="#7E66A3" />
+            <SolidColorBrush x:Key="UnallocatedHatchBrush" Color="#5A5A5A" />
+            <SolidColorBrush x:Key="UnallocatedStrokeBrush" Color="#ABABAB" />
+            <SolidColorBrush x:Key="MiniVolumeBrush" Color="#4FA3E0" />
+            <SolidColorBrush x:Key="MiniSystemBrush" Color="#7A7A7A" />
+            <SolidColorBrush x:Key="MiniUnknownBrush" Color="#A58BD0" />
+            <SolidColorBrush x:Key="ChipWarningBackgroundBrush" Color="#433519" />
+            <SolidColorBrush x:Key="ChipCriticalBackgroundBrush" Color="#442726" />
+            <SolidColorBrush x:Key="ChipAccentBackgroundBrush" Color="#1D3A4D" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="HighContrast">
+            <SolidColorBrush x:Key="SegmentUsedBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="SegmentFreeBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="SegmentStrokeBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="SegmentProtectedBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="SegmentProtectedStrokeBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="SegmentUnknownBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="SegmentUnknownStrokeBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="UnallocatedHatchBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="UnallocatedStrokeBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="MiniVolumeBrush" Color="{ThemeResource SystemColorHighlightColor}" />
+            <SolidColorBrush x:Key="MiniSystemBrush" Color="{ThemeResource SystemColorGrayTextColor}" />
+            <SolidColorBrush x:Key="MiniUnknownBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="ChipWarningBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="ChipCriticalBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="ChipAccentBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <!-- Action rows in the Actions panel: full-width, left-aligned, 40 px tall. -->
+    <Style x:Key="ActionRowButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="MinHeight" Value="40" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <!-- Destructive primary buttons (Delete, Format, Clear disk), mvp-features.md section 6. -->
+    <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource AccentButtonStyle}">
+        <Setter Property="Background" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+        <Setter Property="Foreground" Value="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="CaptionTextStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+        <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="CardBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}" />
+        <Setter Property="BorderBrush" Value="{ThemeResource CardStrokeColorDefaultBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="16" />
+    </Style>
+</ResourceDictionary>
