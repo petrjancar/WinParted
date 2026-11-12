@@ -82,4 +82,4 @@
 
 - [x] 13.1 Run the full manual QA checklist (every spec scenario) on the Windows 11 development PC using VHDX disks only; plus a full NTFS format on an expendable USB stick (not possible on VHDX); record results in `docs/qa/mvp-checklist.md` (done 2026-11-11: 77 of 79 scenarios OK; optional VHDX step with 2 scenarios skipped by decision)
 - [x] 13.2 Verify the system disk of the development PC shows every protected item locked with the correct reasons and no destructive action is reachable
-- [ ] 13.3 Publish a self-contained release build, verify it starts elevated (done on the development PC; the clean-machine test was dropped by decision), and attach it to a draft GitHub release (publish needs `EnableMsixTooling`, otherwise WinParted.pri is missing and the window fails to load)
+- [x] 13.3 Publish a self-contained release build, verify it starts elevated (done on the development PC; the clean-machine test was dropped by decision), and attach it to a draft GitHub release (publish needs `EnableMsixTooling`, otherwise WinParted.pri is missing and the window fails to load)
