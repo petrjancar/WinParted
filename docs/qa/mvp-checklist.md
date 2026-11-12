@@ -1,6 +1,6 @@
 # WinParted MVP – QA checklist
 
-Every scenario in `openspec/changes/winparted-mvp/specs/` with how it was checked (task 13.1).
+Every scenario in `openspec/specs/` (added by the `winparted-mvp` change, now in `openspec/changes/archive/2026-11-12-winparted-mvp/`) with how it was checked (task 13.1).
 Machine: the Windows 11 development PC. Real-disk checks used only temporary VHDX disks and an empty
 Kingston DataTraveler 3.0 USB stick (14.4 GB), never the PC's own disks.
 

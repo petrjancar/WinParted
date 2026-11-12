@@ -2,7 +2,7 @@
 
 This document is the input for the WinParted UI design. It describes **what** the MVP must show and do: every screen, state, dialog, and the exact wording of reasons, warnings and errors. It does not prescribe visual style beyond the platform constraints below. Visual design, layout details, iconography and motion are up to the designer.
 
-Source of truth for behavior: `openspec/changes/winparted-mvp/specs/`. If this brief and a spec disagree, the spec wins. Report the mismatch so the brief can be fixed.
+Source of truth for behavior: `openspec/specs/`. If this brief and a spec disagree, the spec wins. Report the mismatch so the brief can be fixed.
 
 ---
 

@@ -1,7 +1,7 @@
 # WinParted spikes
 
 Throwaway experiments that answer questions about the Windows Storage Management API before the
-real disk code is written (tasks group 2 in `openspec/changes/winparted-mvp/tasks.md`). Not part of
+real disk code is written (tasks group 2 in `openspec/changes/archive/2026-11-12-winparted-mvp/tasks.md`). Not part of
 `WinParted.sln`.
 
 ## Safety
