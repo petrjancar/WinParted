@@ -26,6 +26,16 @@ public sealed partial class MainWindow : Window
         AppTitleBar.Loaded += (_, _) => UpdateTitleBarLayout();
         AppTitleBar.SizeChanged += (_, _) => UpdateTitleBarLayout();
 
+        // Caption buttons (minimize, maximize, close) follow the app's theme, not the Windows one, so
+        // they stay readable when the two differ (e.g. --theme dark on a light Windows).
+        if (Content is FrameworkElement root)
+        {
+            void MatchTheme() => AppWindow.TitleBar.PreferredTheme =
+                root.ActualTheme == ElementTheme.Dark ? TitleBarTheme.Dark : TitleBarTheme.Light;
+            MatchTheme();
+            root.ActualThemeChanged += (_, _) => MatchTheme();
+        }
+
         // Design: minimum 1000 x 640 effective pixels. AppWindow works in physical pixels, so scale
         // by the window's DPI (e.g. 150% display scaling = 1.5).
         var scale = GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
