@@ -1,5 +1,6 @@
 # WinParted
 
+[![CI](https://github.com/petrjancar/WinParted/actions/workflows/ci.yml/badge.svg)](https://github.com/petrjancar/WinParted/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/petrjancar)
 
