@@ -1,0 +1,34 @@
+# Monthly, grouped dependency updates: at most a few pull requests a month.
+# The release zip is self-contained, so a fix in a bundled package reaches users only with a new release.
+# Note: the bundled .NET runtime comes from the SDK that builds the release, which Dependabot doesn't track.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      # Its own pull request: CI checks the build, but UI changes need a manual run before merging.
+      windows-app-sdk:
+        patterns:
+          - Microsoft.WindowsAppSDK*
+          - Microsoft.Windows.SDK.BuildTools
+      test:
+        patterns:
+          - xunit*
+          - Microsoft.NET.Test.Sdk
+          - coverlet.*
+          - Microsoft.Extensions.TimeProvider.Testing
+      other:
+        patterns:
+          - "*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns:
+          - "*"
