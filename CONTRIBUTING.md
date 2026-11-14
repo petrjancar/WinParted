@@ -1,7 +1,5 @@
 # Contributing to WinParted
 
-Thanks for helping. This page is for people who build, test or release WinParted. For what the app does and how to get it, see the [README](README.md).
-
 ## Building
 
 Prerequisites: [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). Visual Studio 2026 (with the "WinUI application development" workload) is optional but recommended for working on the UI.
