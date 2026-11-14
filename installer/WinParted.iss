@@ -1,6 +1,6 @@
 ; WinParted installer (Inno Setup 6). Design D2 of the add-installer-and-updates change.
 ;
-; Build from the repository root after `dotnet publish` (see README, "Releasing"):
+; Build from the repository root after `dotnet publish` (see CONTRIBUTING.md, "Releasing"):
 ;   iscc /DAppVersion=0.2.0 installer\WinParted.iss
 ; Output: artifacts\WinParted-<version>-setup.exe
 
