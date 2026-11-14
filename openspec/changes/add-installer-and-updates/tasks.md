@@ -14,7 +14,7 @@
 ## 3. Settings
 
 - [x] 3.1 Add `AppSettings` (CheckForUpdates = true, IncludePrereleases = false) with JSON parse/serialize in Core; verify unit tests for defaults, round trip, unknown fields, and missing/empty/corrupt input falling back to defaults
-- [ ] 3.2 Add the App `SettingsStore` (read once at start, save on change via temp file + replace, writes ignored when not elevated); verify by toggling a value in a Debug elevated run, restarting, and seeing it kept, and that a non-elevated Debug run starts with the saved values without errors
+- [x] 3.2 Add the App `SettingsStore` (read once at start, save on change via temp file + replace, writes ignored when not elevated); verify by toggling a value in a Debug elevated run, restarting, and seeing it kept, and that a non-elevated Debug run starts with the saved values without errors
 
 ## 4. Update check
 
@@ -25,22 +25,22 @@
 ## 5. Update notice and About
 
 - [x] 5.1 Add `ToastKind.Update` and the update notice ("WinParted x.y.z is available", "pre-release" marker, "View release" opens `html_url`), held back while `IsBusy` and shown after the operation's result; strings in `Texts.resx`; verify with a test hook or a temporarily lowered version in a Debug build: notice appears, link opens the release page, close removes it, and starting a format before the check finishes delays the notice until the result is shown
-- [ ] 5.2 Extend the About dialog: repository link (`github.com/petrjancar/WinParted`), "Check for updates when WinParted starts" and "Include pre-releases" switches bound to the settings store, pre-release switch disabled while checks are off, both disabled when not elevated; verify each `app-info` scenario by hand (including Tab order, Escape and Enter) and with Narrator for the accessible names
-- [ ] 5.3 Check the built About dialog and update notice against `docs/design/installer-and-updates.md` and the approved designs (light, dark, High Contrast, minimum window size); fix differences or update the brief where the design changed; verify each deliverable in brief section 9 matches the running app
+- [x] 5.2 Extend the About dialog: repository link (`github.com/petrjancar/WinParted`), "Check for updates when WinParted starts" and "Include pre-releases" switches bound to the settings store, pre-release switch disabled while checks are off, both disabled when not elevated; verify each `app-info` scenario by hand (including Tab order, Escape and Enter) and with Narrator for the accessible names
+- [x] 5.3 Check the built About dialog and update notice against `docs/design/installer-and-updates.md` and the approved designs (light, dark, High Contrast, minimum window size); fix differences or update the brief where the design changed; verify each deliverable in brief section 9 matches the running app
 
 ## 6. Installer
 
-- [ ] 6.1 Write `installer/WinParted.iss` per D2 (fixed AppId, admin, x64, Windows 11 minimum, Program Files, Start menu with Uninstall entry, AppMutex, `AppVersion` from `/DAppVersion`, `[UninstallDelete]` for `{commonappdata}\WinParted` and `{localappdata}\WinParted`, downgrade warning in `[Code]`); verify `iscc` builds `WinParted-<version>-setup.exe` from the published folder without warnings
-- [ ] 6.2 Add the installer to CI (run `iscc` after publish, install Inno Setup with choco only if missing, upload the setup exe with the build artifact); verify a pull request run produces the setup exe artifact
-- [ ] 6.3 Document in README: install, update (run the new installer or replace the zip folder) and uninstall, plus the local release steps (publish, zip, `iscc` with the version from `dotnet msbuild -getProperty:Version`); verify the commands in README run as written
+- [x] 6.1 Write `installer/WinParted.iss` per D2 (fixed AppId, admin, x64, Windows 11 minimum, Program Files, Start menu with Uninstall entry, AppMutex, `AppVersion` from `/DAppVersion`, `[UninstallDelete]` for `{commonappdata}\WinParted` and `{localappdata}\WinParted`, downgrade warning in `[Code]`); verify `iscc` builds `WinParted-<version>-setup.exe` from the published folder without warnings
+- [x] 6.2 Add the installer to CI (run `iscc` after publish, install Inno Setup with choco only if missing, upload the setup exe with the build artifact); verify a pull request run produces the setup exe artifact
+- [x] 6.3 Document in README: install, update (run the new installer or replace the zip folder) and uninstall, plus the local release steps (publish, zip, `iscc` with the version from `dotnet msbuild -getProperty:Version`); verify the commands in README run as written
 
 ## 7. End-to-end checks on the development PC
 
-- [ ] 7.1 Fresh install: run the installer (approve the prompt), then check Program Files, the Start menu entry, Installed apps (name, version, publisher) and that the app starts elevated and shows disks; also check that declining the prompt installs nothing (installation spec, "Installer per release")
-- [ ] 7.2 Upgrade and downgrade: install a build with version 0.2.0, turn update checks off, install a build with a higher version (e.g. 0.2.1-test via `/DAppVersion`), verify settings are kept and Installed apps shows one entry; run the older installer and verify the warning; run the installer while WinParted is open and verify it asks to close it
-- [ ] 7.3 Uninstall leaves nothing: with settings and a log present (and a `%LOCALAPPDATA%\WinParted` folder recreated to stand in for 0.1.0 data), uninstall from Settings → Apps while WinParted is open; verify it asks to close it, and afterwards that none of `Program Files\WinParted`, `%ProgramData%\WinParted`, `%LOCALAPPDATA%\WinParted`, the Start menu folder or the uninstall registry key exist
-- [ ] 7.4 Update notice against the real GitHub: with a build whose version is lower than the newest release, verify the notice appears with pre-releases included and doesn't with the default settings; offline start shows nothing and works normally
-- [ ] 7.5 Portable zip: extract and run the zip build; verify it runs, shares settings with the installed app (same data folder), and registers nothing in Installed apps or the Start menu
+- [x] 7.1 Fresh install: run the installer (approve the prompt), then check Program Files, the Start menu entry, Installed apps (name, version, publisher) and that the app starts elevated and shows disks; also check that declining the prompt installs nothing (installation spec, "Installer per release")
+- [x] 7.2 Upgrade and downgrade: install a build with version 0.2.0, turn update checks off, install a build with a higher version (e.g. 0.2.1-test via `/DAppVersion`), verify settings are kept and Installed apps shows one entry; run the older installer and verify the warning; run the installer while WinParted is open and verify it asks to close it
+- [x] 7.3 Uninstall leaves nothing: with settings and a log present (and a `%LOCALAPPDATA%\WinParted` folder recreated to stand in for 0.1.0 data), uninstall from Settings → Apps while WinParted is open; verify it asks to close it, and afterwards that none of `Program Files\WinParted`, `%ProgramData%\WinParted`, `%LOCALAPPDATA%\WinParted`, the Start menu folder or the uninstall registry key exist
+- [x] 7.4 Update notice against the real GitHub: with a build whose version is lower than the newest release, verify the notice appears with pre-releases included and doesn't with the default settings; offline start shows nothing and works normally
+- [x] 7.5 Portable zip: extract and run the zip build; verify it runs, shares settings with the installed app (same data folder), and registers nothing in Installed apps or the Start menu
 
 ## Workflow follow-up
 
