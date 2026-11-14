@@ -2,7 +2,7 @@
 
 This document is the input for the UI design of the `add-installer-and-updates` change. It covers only what's new: the extended **About** dialog and the **update notice**. Everything else (visual system, platform constraints, main window, notifications area) is unchanged from the MVP brief, [mvp-features.md](mvp-features.md), and the existing app. Visual design and layout details are up to the designer.
 
-Source of truth for behavior: the change's specs in `openspec/changes/add-installer-and-updates/specs/` (`app-info`, `update-notice`, `installation`); after the change is archived, `openspec/specs/`. If this brief and a spec disagree, the spec wins. Report the mismatch so the brief can be fixed.
+Source of truth for behavior: `openspec/specs/` (`app-info`, `update-notice`, `installation`), added by the `add-installer-and-updates` change (now in `openspec/changes/archive/2026-11-14-add-installer-and-updates/`). If this brief and a spec disagree, the spec wins. Report the mismatch so the brief can be fixed.
 
 ---
 
