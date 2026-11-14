@@ -33,7 +33,7 @@ jobs:
         run: dotnet build WinParted.sln -c Release
 
       # Unit tests only. WinParted.Storage.IntegrationTests need administrator rights and create
-      # virtual disks, so they run on a developer PC (see README), never in CI.
+      # virtual disks, so they run on a developer PC (see CONTRIBUTING.md), never in CI.
       - name: Unit tests
         run: dotnet test tests/WinParted.Core.Tests -c Release --no-build --logger "trx;LogFileName=core-tests.trx" --results-directory test-results
 
