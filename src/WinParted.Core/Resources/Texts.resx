@@ -335,4 +335,20 @@
   <data name="Reason.RemovableMediaOffline" xml:space="preserve"><value>Windows can't take removable media, like USB flash drives, offline.</value></data>
   <data name="Dlg.UseMaximum" xml:space="preserve"><value>Maximum</value></data>
   <data name="Dlg.UseSmallest" xml:space="preserve"><value>Smallest</value></data>
+  <data name="Update.Available" xml:space="preserve"><value>WinParted {0} is available.</value></data>
+  <data name="Update.AvailablePrerelease" xml:space="preserve"><value>WinParted {0} is available. This is a pre-release.</value></data>
+  <data name="Update.ViewRelease" xml:space="preserve"><value>View release</value></data>
+  <data name="Update.CloseNotice" xml:space="preserve"><value>Close update notice</value></data>
+  <data name="About.Description" xml:space="preserve"><value>A free, open-source disk and partition manager for Windows 11.</value></data>
+  <data name="About.Version" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="About.License" xml:space="preserve"><value>MIT License</value></data>
+  <data name="About.Repository" xml:space="preserve"><value>github.com/petrjancar/WinParted</value></data>
+  <data name="About.Updates" xml:space="preserve"><value>Updates</value></data>
+  <data name="About.CheckForUpdates" xml:space="preserve"><value>Check for updates when WinParted starts</value></data>
+  <data name="About.IncludePrereleases" xml:space="preserve"><value>Include pre-releases</value></data>
+  <data name="About.IncludePrereleasesHint" xml:space="preserve"><value>Early versions that may be less tested.</value></data>
+  <data name="About.Privacy" xml:space="preserve"><value>WinParted asks GitHub for the newest version when it starts. Nothing about your PC or disks is sent.</value></data>
+  <data name="About.NeedsAdmin" xml:space="preserve"><value>Restart WinParted as administrator to change these settings.</value></data>
+  <data name="About.On" xml:space="preserve"><value>On</value></data>
+  <data name="About.Off" xml:space="preserve"><value>Off</value></data>
 </root>

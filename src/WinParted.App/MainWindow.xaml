@@ -27,7 +27,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition x:Name="CaptionButtonsColumn" Width="138" />
             </Grid.ColumnDefinitions>
-            <FontIcon Glyph="&#xEDA2;" FontSize="16" VerticalAlignment="Center" />
+            <Image Source="ms-appx:///Assets/WinParted-64.png" Width="16" Height="16" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw" />
             <TextBlock Grid.Column="1" Text="WinParted" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
             <TextBlock Grid.Column="2" Text="{x:Bind TitleSubtitle}" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -114,7 +114,7 @@
             </Grid>
 
             <!-- Content area -->
-            <Grid Grid.Column="1" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            <Grid Grid.Column="1" RowDefinitions="*,Auto" Background="{ThemeResource LayerFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                   BorderThickness="1,1,0,0" CornerRadius="8,0,0,0">
                 <ProgressBar IsIndeterminate="True" VerticalAlignment="Top" Visibility="{x:Bind app:Ui.Show(Vm.IsRefreshing), Mode=OneWay}"
                              AutomationProperties.Name="Refreshing disk information" />
@@ -147,7 +147,7 @@
                 </StackPanel>
 
                 <ScrollViewer Visibility="{x:Bind app:Ui.Show(Vm.ShowContent), Mode=OneWay}">
-                    <StackPanel Padding="28,24,28,96" Spacing="20" MaxWidth="1200">
+                    <StackPanel Padding="28,24,28,24" Spacing="20" MaxWidth="1200">
                         <!-- Header -->
                         <StackPanel Spacing="10">
                             <StackPanel Orientation="Horizontal" Spacing="12">
@@ -334,16 +334,18 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Bottom of the content area: notifications at the right (newest on top), and the
-                     running-operation bar (task 12.1) below them while an operation runs. -->
-                <StackPanel VerticalAlignment="Bottom" Margin="16" Spacing="8">
+                <!-- Bottom of the content area, in its own row so it pushes the content up instead of
+                     covering it (installer-and-updates brief, section 8): notifications at the right
+                     (newest on top, the update notice always last), and the running-operation bar
+                     (task 12.1) below them while an operation runs. -->
+                <StackPanel Grid.Row="1" Margin="16,0,16,16" Spacing="8">
                     <ItemsRepeater ItemsSource="{x:Bind Vm.Toasts}" HorizontalAlignment="Right" Width="440">
                         <ItemsRepeater.Layout>
                             <StackLayout Spacing="8" />
                         </ItemsRepeater.Layout>
                         <ItemsRepeater.ItemTemplate>
                             <DataTemplate x:DataType="app:Toast">
-                                <InfoBar IsOpen="{x:Bind IsOpen, Mode=TwoWay}" Message="{x:Bind Message}" Severity="{x:Bind app:Ui.Severity(Kind)}" Closed="OnToastClosed">
+                                <InfoBar IsOpen="{x:Bind IsOpen, Mode=TwoWay}" Message="{x:Bind Message}" Severity="{x:Bind app:Ui.Severity(Kind)}" Closed="OnToastClosed" Loaded="OnToastLoaded" Tag="{x:Bind}">
                                     <InfoBar.ActionButton>
                                         <Button Content="{x:Bind ActionText}" Visibility="{x:Bind app:Ui.Show(HasAction)}" Click="OnToastActionClick" Tag="{x:Bind}" />
                                     </InfoBar.ActionButton>

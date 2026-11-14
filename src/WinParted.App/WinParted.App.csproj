@@ -9,6 +9,8 @@
     <RootNamespace>WinParted.App</RootNamespace>
     <AssemblyName>WinParted</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- Built from docs/design/app-icon by make-icon.ps1. -->
+    <ApplicationIcon>Assets\WinParted.ico</ApplicationIcon>
     <ApplicationManifest Condition="'$(Configuration)' == 'Debug'">app.debug.manifest</ApplicationManifest>
     <Platforms>x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
@@ -28,6 +30,11 @@
     <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" Version="2.6.5" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Window and taskbar icon (AppWindow.SetIcon) and the title bar / About image. -->
+    <Content Include="Assets\WinParted.ico;Assets\WinParted-64.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

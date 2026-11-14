@@ -45,6 +45,28 @@ jobs:
         shell: pwsh
         run: if (-not (Test-Path artifacts/WinParted-win-x64/WinParted.pri)) { throw 'WinParted.pri is missing from the published build' }
 
+      # Installer (installer/WinParted.iss), versioned from <Version> in Directory.Build.props.
+      # Inno Setup 6 is preinstalled on windows-latest; install it only if a future image drops it.
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            choco install innosetup --no-progress -y
+            if ($LASTEXITCODE -ne 0) { throw 'Installing Inno Setup failed' }
+          }
+          $version = (dotnet msbuild src/WinParted.App/WinParted.App.csproj -getProperty:Version).Trim()
+          & $iscc "/DAppVersion=$version" installer/WinParted.iss
+          if ($LASTEXITCODE -ne 0) { throw "ISCC failed with exit code $LASTEXITCODE" }
+          if (-not (Test-Path "artifacts/WinParted-$version-setup.exe")) { throw 'The installer was not created' }
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v7
+        with:
+          name: WinParted-setup
+          path: artifacts/WinParted-*-setup.exe
+          retention-days: 7
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v7
