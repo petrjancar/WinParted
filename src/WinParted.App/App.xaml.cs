@@ -13,14 +13,45 @@ public partial class App : Application
     private IDeviceChangeSource? _deviceChanges;
     private ChangeDebouncer? _debouncer;
 
+    /// <summary>
+    /// Held while the app runs, so the installer and uninstaller can ask the user to close WinParted
+    /// first (Inno Setup AppMutex, design D2). Both the session-local and the global name, as Inno
+    /// recommends.
+    /// </summary>
+    private static readonly Mutex[] RunningMutexes = CreateRunningMutexes();
+
+    private static Mutex[] CreateRunningMutexes()
+    {
+        var mutexes = new List<Mutex>();
+        foreach (var name in new[] { "WinParted.Running", @"Global\WinParted.Running" })
+        {
+            try
+            {
+                mutexes.Add(new Mutex(initiallyOwned: false, name));
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException or IOException or WaitHandleCannotBeOpenedException)
+            {
+                // Another account's instance created it with rights we don't have; it already exists, which is all Inno checks.
+            }
+        }
+
+        return [.. mutexes];
+    }
+
     public App()
     {
+        _ = RunningMutexes.Length;
         InitializeComponent();
         if (Option("--culture") is { } culture)
         {
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = new System.Globalization.CultureInfo(culture);
             System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.DefaultThreadCurrentCulture;
         }
+        if (Option("--pretend-version") is { } pretend && Core.Updates.UpdateCheck.TryParseVersion(pretend) is { } version)
+        {
+            UpdateService.PretendVersion = version;
+        }
+
         if (Option("--theme") is { } theme)
         {
             RequestedTheme = theme.Equals("dark", StringComparison.OrdinalIgnoreCase) ? ApplicationTheme.Dark : ApplicationTheme.Light;
@@ -29,15 +60,23 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Diagnostic log: %LOCALAPPDATA%\WinParted\winparted.log, or the file named by the
-    /// WINPARTED_LOG environment variable.
+    /// The one folder WinParted writes to (%ProgramData%\WinParted): settings and the diagnostic log,
+    /// the same for every account, the installed app and the zip, so the uninstaller can remove it
+    /// (installation spec, design D3).
+    /// </summary>
+    public static string DataFolder { get; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WinParted");
+
+    /// <summary>
+    /// Diagnostic log: winparted.log in <see cref="DataFolder"/>, or the file named by the
+    /// WINPARTED_LOG environment variable. Write failures (e.g. without administrator rights) are ignored.
     /// </summary>
     public static void Log(string message)
     {
         try
         {
             var path = Environment.GetEnvironmentVariable("WINPARTED_LOG")
-                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinParted", "winparted.log");
+                ?? Path.Combine(DataFolder, "winparted.log");
             Directory.CreateDirectory(Path.GetDirectoryName(path)!);
             File.AppendAllText(path, $"{DateTime.Now:O} {message}{Environment.NewLine}");
         }
@@ -51,7 +90,8 @@ public partial class App : Application
 
     /// <summary>
     /// Developer options: <c>--theme dark|light</c>, <c>--culture name</c> (number formatting, e.g. en-US),
-    /// <c>--select disk[:segment]</c>, <c>--open action</c>.
+    /// <c>--select disk[:segment]</c>, <c>--open action</c>, <c>--pretend-version x.y.z</c> (the update check
+    /// compares against this version and also runs without administrator rights).
     /// </summary>
     private static string? Option(string name)
     {

@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!-- Release version: shown in About and in the zip name. -->
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>WinParted contributors</Authors>
     <Product>WinParted</Product>
     <Copyright>Copyright (c) WinParted contributors</Copyright>

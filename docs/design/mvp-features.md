@@ -455,6 +455,8 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 
 An **About** entry (version, MIT license, GitHub link) is in scope but can be minimal.
 
+Update checks and the extended About dialog came after the MVP: see [installer-and-updates.md](installer-and-updates.md).
+
 ---
 
 ## 12. Deliverables requested from design

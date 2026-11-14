@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- WinParted app icon, used for 40 px and larger. The partition bar: used, small, free space. -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A8A97"/><stop offset="1" stop-color="#16525B"/></linearGradient></defs>
+  <rect x="12" y="12" width="232" height="232" rx="52" fill="url(#bg)"/>
+  <rect x="40" y="76" width="176" height="104" rx="18" fill="#0F3B42" opacity="0.35"/>
+  <rect x="48" y="84" width="88" height="88" rx="12" fill="#FFFFFF"/>
+  <rect x="144" y="84" width="32" height="88" rx="10" fill="#B9E3EA"/>
+  <rect x="186" y="87" width="22" height="82" rx="8" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-dasharray="8 7"/>
+</svg>

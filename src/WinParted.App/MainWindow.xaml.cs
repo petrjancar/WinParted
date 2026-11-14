@@ -23,6 +23,7 @@ public sealed partial class MainWindow : Window
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
         AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+        AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "WinParted.ico"));
         AppTitleBar.Loaded += (_, _) => UpdateTitleBarLayout();
         AppTitleBar.SizeChanged += (_, _) => UpdateTitleBarLayout();
 
@@ -73,6 +74,13 @@ public sealed partial class MainWindow : Window
     {
         await viewModel.RefreshAsync();
 
+        // Update check (update-notice spec): after the first disk load, in the background, only with
+        // administrator rights (or the --pretend-version developer option).
+        if (App.IsElevated || UpdateService.PretendVersion is not null)
+        {
+            _ = CheckForUpdateAsync(viewModel);
+        }
+
         // Dialogs need the window's content to be loaded (XamlRoot).
         while (Content.XamlRoot is null)
         {
@@ -83,6 +91,14 @@ public sealed partial class MainWindow : Window
         {
             await Task.Delay(500);
             await OpenActionSafeAsync(kind);
+        }
+    }
+
+    private async Task CheckForUpdateAsync(MainViewModel viewModel)
+    {
+        if (await Task.Run(() => UpdateService.CheckAsync(SettingsStore.Current)) is { } update)
+        {
+            DispatcherQueue.TryEnqueue(() => viewModel.ShowUpdate(update));
         }
     }
 
@@ -169,7 +185,12 @@ public sealed partial class MainWindow : Window
     {
         if (sender is Button { Tag: Toast toast })
         {
-            Vm.RemoveToast(toast);
+            // The update notice stays until closed (View release only opens the browser).
+            if (toast.Kind != ToastKind.Update)
+            {
+                Vm.RemoveToast(toast);
+            }
+
             toast.Action?.Invoke();
         }
     }
@@ -270,6 +291,57 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Names each notification's close button in English (InfoBar's default name follows the Windows
+    /// language); the update notice's is "Close update notice" (brief section 8). The button exists
+    /// only once the template is applied, so this retries after the first layout pass.
+    /// </summary>
+    private void OnToastLoaded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not InfoBar { Tag: Toast toast } bar)
+        {
+            return;
+        }
+
+        var name = Core.Text.Texts.Get(toast.Kind == ToastKind.Update ? "Update.CloseNotice" : "Dlg.Close");
+        bool TryName()
+        {
+            if (FindNamed(bar, "CloseButton") is not Button close)
+            {
+                return false;
+            }
+
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(close, name);
+            ToolTipService.SetToolTip(close, name);
+            return true;
+        }
+
+        bar.ApplyTemplate();
+        if (!TryName())
+        {
+            DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, () => TryName());
+        }
+    }
+
+    private static FrameworkElement? FindNamed(DependencyObject root, string name)
+    {
+        for (var i = 0; i < Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(root, i);
+            if (child is FrameworkElement { Name: var n } element && n == name)
+            {
+                return element;
+            }
+
+            if (FindNamed(child, name) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
     private void OnToastClosed(InfoBar sender, InfoBarClosedEventArgs args)
     {
         if (sender.DataContext is Toast toast)
@@ -278,21 +350,96 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// About (app-info spec; installer-and-updates brief, section 3): version, license, repository link
+    /// and the two update settings, saved as soon as they change.
+    /// </summary>
     private async void OnAboutClick(object sender, RoutedEventArgs e)
     {
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
-        var content = new StackPanel { Spacing = 12, MaxWidth = 340 };
-        content.Children.Add(new TextBlock { Text = "A free, open-source disk and partition manager for Windows 11.", TextWrapping = TextWrapping.Wrap });
-        content.Children.Add(new TextBlock { Text = $"Version {version}", Style = (Style)Application.Current.Resources["CaptionTextStyle"] });
-        content.Children.Add(new TextBlock { Text = "MIT License", Style = (Style)Application.Current.Resources["CaptionTextStyle"] });
+        static string T(string key) => Core.Text.Texts.Get(key);
+        var caption = (Style)Application.Current.Resources["CaptionTextStyle"];
+        var secondary = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"];
+        var canChange = App.IsElevated;
+        var settings = SettingsStore.Current;
+
+        var content = new StackPanel { Spacing = 12, MaxWidth = 360 };
+        content.Children.Add(new TextBlock { Text = T("About.Description"), TextWrapping = TextWrapping.Wrap });
+
+        var facts = new StackPanel { Spacing = 2 };
+        facts.Children.Add(new TextBlock { Text = string.Format(System.Globalization.CultureInfo.CurrentCulture, T("About.Version"), UpdateService.CurrentVersion.ToString(3)), Style = caption });
+        facts.Children.Add(new TextBlock { Text = T("About.License"), Style = caption });
+        content.Children.Add(facts);
+
+        var linkContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+        linkContent.Children.Add(new TextBlock { Text = T("About.Repository") });
+        linkContent.Children.Add(new FontIcon { Glyph = "", FontSize = 12 });
+        var link = new HyperlinkButton { Content = linkContent, Padding = new Thickness(0), Margin = new Thickness(0, -4, 0, 0) };
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(link, T("About.Repository"));
+        link.Click += (_, _) => UpdateService.OpenInBrowser(UpdateService.RepositoryUrl);
+        content.Children.Add(link);
+
+        var updates = new StackPanel { Spacing = 8, Margin = new Thickness(0, 4, 0, 0) };
+        updates.Children.Add(new TextBlock { Text = T("About.Updates"), Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"] });
+        if (!canChange)
+        {
+            var needsAdmin = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            needsAdmin.Children.Add(new FontIcon { Glyph = "", FontSize = 14, Foreground = secondary, VerticalAlignment = VerticalAlignment.Top, Margin = new Thickness(0, 2, 0, 0) });
+            needsAdmin.Children.Add(new TextBlock { Text = T("About.NeedsAdmin"), TextWrapping = TextWrapping.Wrap, MaxWidth = 330, Foreground = secondary });
+            updates.Children.Add(needsAdmin);
+        }
+
+        // On/Off set explicitly: the default texts come from Windows' language, the app is English-only.
+        var check = new ToggleSwitch { Header = T("About.CheckForUpdates"), IsOn = settings.CheckForUpdates, IsEnabled = canChange, OnContent = T("About.On"), OffContent = T("About.Off") };
+        var prereleaseHeader = new StackPanel();
+        prereleaseHeader.Children.Add(new TextBlock { Text = T("About.IncludePrereleases") });
+        var hint = new TextBlock { Text = T("About.IncludePrereleasesHint"), Style = caption, Foreground = secondary };
+        prereleaseHeader.Children.Add(hint);
+        var prerelease = new ToggleSwitch { Header = prereleaseHeader, IsOn = settings.IncludePrereleases, IsEnabled = canChange && settings.CheckForUpdates, OnContent = T("About.On"), OffContent = T("About.Off") };
+        void DimHint() => hint.Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources[prerelease.IsEnabled ? "TextFillColorSecondaryBrush" : "TextFillColorDisabledBrush"];
+        DimHint();
+        prerelease.IsEnabledChanged += (_, _) => DimHint();
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(check, T("About.CheckForUpdates"));
+        Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(prerelease, T("About.IncludePrereleases"));
+        if (!canChange)
+        {
+            // Disabled switches are announced with their reason (brief section 8).
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(check, T("About.NeedsAdmin"));
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetHelpText(prerelease, T("About.NeedsAdmin"));
+        }
+
+        check.Toggled += (_, _) =>
+        {
+            SettingsStore.Save(SettingsStore.Current with { CheckForUpdates = check.IsOn });
+            prerelease.IsEnabled = check.IsOn;
+        };
+        prerelease.Toggled += (_, _) => SettingsStore.Save(SettingsStore.Current with { IncludePrereleases = prerelease.IsOn });
+        updates.Children.Add(check);
+        updates.Children.Add(prerelease);
+        updates.Children.Add(new TextBlock { Text = T("About.Privacy"), Style = caption, Foreground = secondary, TextWrapping = TextWrapping.Wrap });
+        content.Children.Add(updates);
+
+        var title = new StackPanel { Spacing = 8 };
+        title.Children.Add(new Image
+        {
+            Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/WinParted-64.png")),
+            Width = 32,
+            Height = 32,
+            HorizontalAlignment = HorizontalAlignment.Left,
+        });
+        title.Children.Add(new TextBlock { Text = "WinParted" });
+
         var dialog = new ContentDialog
         {
-            Title = "WinParted",
+            Title = title,
             Content = content,
-            CloseButtonText = "Close",
+            CloseButtonText = T("Dlg.Close"),
             DefaultButton = ContentDialogButton.Close,
             XamlRoot = Content.XamlRoot,
         };
+
+        // Start on Close, the highlighted button, so Enter closes the dialog like every other one
+        // (app-info spec); Tab then goes link, switches, Close.
+        dialog.Opened += (_, _) => (FindNamed(dialog, "CloseButton") as Control)?.Focus(FocusState.Programmatic);
         await dialog.ShowAsync();
     }
 

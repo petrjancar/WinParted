@@ -15,6 +15,9 @@ public enum ToastKind
     Success,
     Warning,
     Error,
+
+    /// <summary>Newer release available (update-notice spec): informational, stays until closed, always last.</summary>
+    Update,
 }
 
 public sealed partial class Toast : ObservableObject
@@ -165,6 +168,7 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
                 break;
         }
 
+        ShowPendingUpdate();
         return result;
     }
 
@@ -323,6 +327,49 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
     }
 
     public void RemoveToast(Toast toast) => Toasts.Remove(toast);
+
+    private Core.Updates.AvailableUpdate? _pendingUpdate;
+    private bool _updateShown;
+
+    /// <summary>
+    /// Shows the update notice once per start (update-notice spec). While an operation runs it waits
+    /// until the operation has ended and its result is shown. It is added at the bottom of the
+    /// notifications, so newer results and errors appear above it.
+    /// </summary>
+    public void ShowUpdate(Core.Updates.AvailableUpdate update)
+    {
+        if (_updateShown)
+        {
+            return;
+        }
+
+        if (IsBusy)
+        {
+            App.Log("Update notice held until the running operation ends.");
+            _pendingUpdate = update;
+            return;
+        }
+
+        _updateShown = true;
+        App.Log($"Update notice shown for {update.VersionText}.");
+        var text = Core.Text.Texts.Get(update.IsPrerelease ? "Update.AvailablePrerelease" : "Update.Available");
+        Toasts.Add(new Toast
+        {
+            Message = string.Format(System.Globalization.CultureInfo.CurrentCulture, text, update.VersionText),
+            Kind = ToastKind.Update,
+            ActionText = Core.Text.Texts.Get("Update.ViewRelease"),
+            Action = () => UpdateService.OpenInBrowser(update.PageUrl),
+        });
+    }
+
+    private void ShowPendingUpdate()
+    {
+        if (_pendingUpdate is { } update)
+        {
+            _pendingUpdate = null;
+            ShowUpdate(update);
+        }
+    }
 
     partial void OnSelectedDiskChanged(DiskView? value)
     {

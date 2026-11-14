@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Simplified for 20-32 px: pixel-aligned, free space as a solid outline. -->
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A8A97"/><stop offset="1" stop-color="#16525B"/></linearGradient></defs>
+  <rect x="1" y="1" width="30" height="30" rx="7" fill="url(#bg)"/>
+  <rect x="5" y="9" width="12" height="14" rx="2" fill="#FFFFFF"/>
+  <rect x="18" y="9" width="4" height="14" rx="1.5" fill="#B9E3EA"/>
+  <rect x="23.75" y="9.75" width="3.5" height="12.5" rx="1.25" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+</svg>
