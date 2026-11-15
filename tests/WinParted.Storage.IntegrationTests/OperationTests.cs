@@ -49,6 +49,22 @@ public sealed class OperationTests : IDisposable
     private async Task<Partition> DataPartition() =>
         (await _vhd.DiskAsync()).Partitions.Last(p => p.Content != PartitionContent.Reserved);
 
+    // ----- turn-off-disk-read-only 3.2 ---------------------------------------------------------
+
+    [AdminFact]
+    public async Task Turn_off_read_only_makes_the_disk_writable()
+    {
+        await Initialize(PartitionStyle.Gpt);
+        await _vhd.SetReadOnlyAsync();
+        Assert.True((await _vhd.DiskAsync()).IsReadOnly);
+
+        await _vhd.Execute(s => new ClearReadOnlyRequest(new DiskTarget(_vhd.Id), TestVhd.Fingerprint(s, new DiskTarget(_vhd.Id))));
+
+        Assert.False((await _vhd.DiskAsync()).IsReadOnly);
+        await Create(100 * MB, new FormatOptions(FileSystemKind.Ntfs, "WRITABLE"));
+        Assert.Contains((await _vhd.DiskAsync()).Partitions, p => p.Volume?.Label == "WRITABLE");
+    }
+
     // ----- 7.1 reading ------------------------------------------------------------------------
 
     [AdminFact]

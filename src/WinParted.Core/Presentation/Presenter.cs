@@ -402,21 +402,6 @@ public static class Presenter
         return new ActionsView(T("Ui.Action.Actions"), groups);
     }
 
-    /// <summary>Disk-level buttons for the header, with disabled reasons merged into summary lines.</summary>
-    public static DiskActionsView DiskActions(StorageSnapshot snapshot, DiskId disk, bool isBusy)
-    {
-        var states = ActionAvailability.ForSelection(snapshot, Selection.OfDisk(disk), isBusy);
-        var items = states.Select(Item).ToImmutableArray();
-        var reasons = items
-            .Where(i => !i.IsEnabled)
-            .GroupBy(i => i.Reason!)
-            .Select(g => new ReasonSummary(JoinAnd([.. g.Select(i => i.Label)]), g.Key))
-            .ToImmutableArray();
-        return new DiskActionsView(items, reasons);
-    }
-
-    public static string ReasonSummaryText(ReasonSummary summary) => F("Ui.ReasonSummary", summary.Labels, summary.Reason);
-
     private static ActionItem Item(ActionState s) =>
         new(s.Kind, T($"Ui.Action.{s.Kind}"), s.IsEnabled, s.DisabledReason?.Text);
 

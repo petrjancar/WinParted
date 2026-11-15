@@ -150,7 +150,8 @@ public class ProtectedStorageScenarioTests
         }
 
         Disabled(Evaluate(snapshot, ActionKind.ClearDisk, disk), ReasonCode.DiskReadOnly);
-        Assert.Contains("write-protected", Reason.Of(ReasonCode.DiskReadOnly).Text, StringComparison.Ordinal);
+        Enabled(Evaluate(snapshot, ActionKind.ClearReadOnly, disk));
+        Assert.Contains("Turn off read-only", Reason.Of(ReasonCode.DiskReadOnly).Text, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -160,6 +161,7 @@ public class ProtectedStorageScenarioTests
         var snapshot = Layouts.Snapshot(offline);
 
         Enabled(Evaluate(snapshot, ActionKind.BringOnline, offline));
+        Enabled(Evaluate(snapshot, ActionKind.ClearReadOnly, offline));
         Disabled(Evaluate(snapshot, ActionKind.Initialize, offline), ReasonCode.DiskReadOnly);
         Disabled(Evaluate(snapshot, ActionKind.ClearDisk, offline), ReasonCode.DiskReadOnly);
 
@@ -167,6 +169,7 @@ public class ProtectedStorageScenarioTests
         var online = new DiskBuilder(4) { IsReadOnly = true }.Vol(64 * GB, letter: 'V').Build();
         var after = Layouts.Snapshot(online);
         Disabled(Evaluate(after, ActionKind.TakeOffline, online), ReasonCode.DiskReadOnly);
+        Enabled(Evaluate(after, ActionKind.ClearReadOnly, online));
         foreach (var kind in AllPartitionActions)
         {
             Disabled(Evaluate(after, kind, online.Partitions[0]), ReasonCode.DiskReadOnly);

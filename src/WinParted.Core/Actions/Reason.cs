@@ -37,6 +37,7 @@ public enum ReasonCode
     AlreadyInitialized,
     RemovableMediaOffline,
     DiskAlreadyEmpty,
+    DiskNotReadOnly,
     MbrPartitionLimit,
     UnreadablePartition,
     NeedsFormatFirst,

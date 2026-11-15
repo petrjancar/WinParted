@@ -73,3 +73,19 @@ Consequences:
 - Offer "Initialize now" only if the disk really ended up not initialized. Otherwise offer
   "Create partition" for the free space.
 - A USB stick can't be switched to GPT through Clear + Initialize. Not needed for the MVP.
+
+## Read-only flag (turn-off-disk-read-only, 2026-11-15)
+
+`readonly` spike on temporary VHDX files (log `readonly-20261115-133008.log`):
+
+| Case | `SetAttributes(IsReadOnly=false)` | `IsReadOnly` afterwards |
+|---|---|---|
+| Online disk made read-only with `SetAttributes(IsReadOnly=true)` | 0 | False: writable again |
+| Same, called again on the now writable disk | 0 | False (no-op, no error) |
+| Read-only **and offline** disk | 0 | False; the disk stays offline, `Online()` then works |
+| VHDX attached read-only (`attach vdisk readonly`) | **0** | **True**: Windows reports success, the disk stays read-only |
+
+- A write on a read-only disk (`CreatePartition`) returns **41002**, as already mapped.
+- Consequences: Turn off read-only is available on offline disks too, and the result must come from re-reading the disk, never from the return code (design D2). The read-only attach is the case that proves it.
+
+`readonly-card` (task 1.2): with an SD card whose lock switch was on, Windows reported **no** read-only removable disk, so the card wasn't read-only to Windows at all (many card readers don't pass the switch on, or the switch is broken). Not tested on real locked hardware; the read-only attach above covers the same "still read-only" path.

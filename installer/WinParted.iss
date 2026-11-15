@@ -40,8 +40,6 @@ RestartApplications=no
 UninstallDisplayName=WinParted
 UninstallDisplayIcon={app}\WinParted.exe
 SetupIconFile=..\src\WinParted.App\Assets\WinParted.ico
-; {localappdata} below is the 0.1.0 log folder of the account running the uninstaller (installation spec).
-UsedUserAreasWarning=no
 OutputDir=..\artifacts
 OutputBaseFilename=WinParted-{#AppVersion}-setup
 Compression=lzma2/max
@@ -60,9 +58,8 @@ Name: "{group}\Uninstall WinParted"; Filename: "{uninstallexe}"
 Filename: "{app}\WinParted.exe"; Description: "Launch WinParted"; Flags: nowait postinstall skipifsilent runascurrentuser
 
 [UninstallDelete]
-; Everything WinParted creates at runtime (installation spec, "Uninstall leaves no files").
+; Everything WinParted creates at runtime (installation spec, "Uninstall removes everything WinParted created").
 Type: filesandordirs; Name: "{commonappdata}\WinParted"
-Type: filesandordirs; Name: "{localappdata}\WinParted"
 
 [Code]
 { Parses "1.2.3" into three numbers; missing or invalid parts count as 0. }

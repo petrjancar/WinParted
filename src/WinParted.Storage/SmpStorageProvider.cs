@@ -64,6 +64,11 @@ public sealed class SmpStorageProvider : IStorageProvider, IDisposable
                 _smp.Invoke(FindDisk(r.Disk.Disk), r.Online ? "Online" : "Offline");
                 break;
 
+            case ClearReadOnlyRequest r:
+                // Only the attribute; whether it really changed is checked by the runner (design D2).
+                _smp.Invoke(FindDisk(r.Disk.Disk), "SetAttributes", ("IsReadOnly", false, CimType.Boolean));
+                break;
+
             case ClearDiskRequest r:
                 _smp.Invoke(FindDisk(r.Disk.Disk), "Clear",
                     ("RemoveData", true, CimType.Boolean),

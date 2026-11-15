@@ -453,7 +453,9 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 
 **Disk 3**: Generic SD/MMC, 29.7 GB, SD, **Not initialized**
 
-**Disk 4**: Msft Virtual Disk, 64 GB, Virtual, GPT, **Offline**
+**Disk 4**: Msft Virtual Disk, 64 GB, Virtual, GPT, **Offline** (reason: Policy) and **Read-only**
+
+**Disk 6** (added with Turn off read-only): Lexar SDXC Card, 59.4 GB, SD, MBR, **Read-only**, one volume PHOTOS (H:), exFAT, 23.8 GB used
 
 ---
 

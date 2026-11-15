@@ -92,6 +92,21 @@ public sealed class TestVhd : IDisposable
         await Provider.ExecuteAsync(request, progress);
     }
 
+    /// <summary>Makes this VHDX read-only (MSFT_Disk.SetAttributes), after the guard. Test setup only.</summary>
+    public async Task SetReadOnlyAsync()
+    {
+        Validate(await DiskAsync());
+        using var session = CimSession.Create(null);
+        var disk = session.QueryInstances(@"root\Microsoft\Windows\Storage", "WQL", "SELECT * FROM MSFT_Disk")
+            .Single(d => d.CimInstanceProperties["ObjectId"]?.Value as string == Id.Value);
+        var args = new CimMethodParametersCollection { CimMethodParameter.Create("IsReadOnly", true, CimType.Boolean, CimFlags.In) };
+        var result = session.InvokeMethod(@"root\Microsoft\Windows\Storage", disk, "SetAttributes", args);
+        if (Convert.ToUInt32(result.ReturnValue.Value) != 0)
+        {
+            throw new InvalidOperationException($"SetAttributes(IsReadOnly=true) returned {result.ReturnValue.Value}.");
+        }
+    }
+
     public static TargetFingerprint Fingerprint(StorageSnapshot s, ActionTarget t) =>
         TargetFingerprint.Of(s, t) ?? throw new InvalidOperationException("Target not in snapshot.");
 

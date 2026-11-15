@@ -150,6 +150,35 @@ public sealed partial class MainWindow : Window
 
     private void OnSegmentSelected(object? sender, SegmentRef? segment) => Vm.SelectSegment(segment);
 
+    // ----- Back to the disk view (spec disk-inventory) -----
+
+    private void OnShowDiskClick(object sender, RoutedEventArgs e) => Vm.ShowDisk();
+
+    /// <summary>A click on the disk that is already selected shows its disk view (another disk is handled by SelectionChanged).</summary>
+    private void OnDiskItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is DiskView disk && Equals(disk, Vm.SelectedDisk))
+        {
+            Vm.ShowDisk();
+        }
+    }
+
+    /// <summary>Escape anywhere, except in an open dialog or a text field.</summary>
+    private void OnEscapeInvoked(Microsoft.UI.Xaml.Input.KeyboardAccelerator sender, Microsoft.UI.Xaml.Input.KeyboardAcceleratorInvokedEventArgs args)
+    {
+        if (!HasViewModel || !Vm.HasSegmentSelected || Content.XamlRoot is not { } root
+            || Microsoft.UI.Xaml.Media.VisualTreeHelper.GetOpenPopupsForXamlRoot(root).Any(p => p.Child is ContentDialog)
+            || Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(root) is TextBox)
+        {
+            return;
+        }
+
+        args.Handled = true;
+        Vm.ShowDisk();
+    }
+
+    private void OnClearReadOnlyClick(object sender, RoutedEventArgs e) => _ = OpenActionSafeAsync(ActionKind.ClearReadOnly);
+
     private void OnActionsRequested(object? sender, EventArgs e)
     {
         DispatcherQueue.TryEnqueue(() =>
@@ -222,7 +251,7 @@ public sealed partial class MainWindow : Window
 
         var snapshot = Vm.Snapshot;
         var selection = Vm.CurrentSelection;
-        var isDiskAction = kind is ActionKind.Initialize or ActionKind.BringOnline or ActionKind.TakeOffline or ActionKind.ClearDisk;
+        var isDiskAction = kind is ActionKind.Initialize or ActionKind.BringOnline or ActionKind.TakeOffline or ActionKind.ClearDisk or ActionKind.ClearReadOnly;
         ActionTarget? target = isDiskAction
             ? selection.Disk is DiskId diskId ? new DiskTarget(diskId) : null
             : ActionAvailability.ToTarget(selection);
@@ -244,6 +273,7 @@ public sealed partial class MainWindow : Window
             ActionKind.TakeOffline => await _dialogs.TakeOfflineAsync(new OfflineDialogModel(snapshot, disk)),
             ActionKind.BringOnline => new SetDiskOnlineRequest(new DiskTarget(disk.Id), TargetFingerprint.Of(snapshot, new DiskTarget(disk.Id))!, Online: true),
             ActionKind.ClearDisk => await _dialogs.ClearAsync(new ClearDialogModel(snapshot, disk)),
+            ActionKind.ClearReadOnly => await _dialogs.ClearReadOnlyAsync(new ClearReadOnlyDialogModel(snapshot, disk)),
             ActionKind.CreatePartition when region is not null => await _dialogs.CreateAsync(new CreateDialogModel(snapshot, disk, region), snapshot.Facts),
             ActionKind.DeletePartition when partition is not null => await _dialogs.DeleteAsync(new DeleteDialogModel(snapshot, partition, disk)),
             ActionKind.FormatVolume when partition is not null => await _dialogs.FormatAsync(new FormatDialogModel(snapshot, partition, disk), provider),

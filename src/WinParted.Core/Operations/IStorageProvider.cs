@@ -34,7 +34,8 @@ public sealed record SupportedSizeRange(ulong Minimum, ulong Maximum);
 /// <param name="MayHaveChanged">False only when it's certain nothing on disk was modified.</param>
 /// <param name="Code">The backend's numeric status code, if any.</param>
 /// <param name="Details">Raw technical details for the "Technical details" section.</param>
-public sealed record StorageError(string Message, bool MayHaveChanged, uint? Code = null, string? Details = null);
+/// <param name="Advice">What the user can do, when it's specific to this error; otherwise the generic advice is shown.</param>
+public sealed record StorageError(string Message, bool MayHaveChanged, uint? Code = null, string? Details = null, string? Advice = null);
 
 public sealed class StorageOperationException(StorageError error, Exception? inner = null)
     : Exception(error.Message, inner)

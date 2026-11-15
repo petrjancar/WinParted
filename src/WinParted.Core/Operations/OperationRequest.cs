@@ -28,6 +28,13 @@ public sealed record SetDiskOnlineRequest(DiskTarget Disk, TargetFingerprint Fin
     public override ActionKind Kind => Online ? ActionKind.BringOnline : ActionKind.TakeOffline;
 }
 
+/// <summary>Clears the disk's read-only attribute (MSFT_Disk.SetAttributes); no data is changed.</summary>
+public sealed record ClearReadOnlyRequest(DiskTarget Disk, TargetFingerprint Fingerprint)
+    : OperationRequest(Disk, Fingerprint)
+{
+    public override ActionKind Kind => ActionKind.ClearReadOnly;
+}
+
 public sealed record ClearDiskRequest(DiskTarget Disk, TargetFingerprint Fingerprint)
     : OperationRequest(Disk, Fingerprint)
 {

@@ -68,6 +68,13 @@ public sealed class DialogService(Func<XamlRoot> xamlRoot)
         return await ShowAsync(model, content) ? model.Request() : null;
     }
 
+    /// <summary>Turn off read-only (mvp-features.md 6.12): identity and one explanation, like Take offline.</summary>
+    public async Task<OperationRequest?> ClearReadOnlyAsync(ClearReadOnlyDialogModel model)
+    {
+        var content = Panel(Identity(model.IdentityText), Body(model.Body));
+        return await ShowAsync(model, content) ? model.Request() : null;
+    }
+
     public async Task<OperationRequest?> ClearAsync(ClearDialogModel model)
     {
         var input = new TextBox { Width = 96, HorizontalAlignment = HorizontalAlignment.Left };
@@ -441,7 +448,7 @@ public sealed class DialogService(Func<XamlRoot> xamlRoot)
         var content = Panel(
             Facts((Texts.Get("Fail.WhatHappened"), Value(error.Message)),
                   (Texts.Get("Fail.Changed"), Value(Texts.Get(error.MayHaveChanged ? "Fail.ChangedMaybe" : "Fail.ChangedNo"))),
-                  (Texts.Get("Fail.WhatToDo"), Value(Texts.Get("Fail.WhatToDoText")))),
+                  (Texts.Get("Fail.WhatToDo"), Value(error.Advice ?? Texts.Get("Fail.WhatToDoText")))),
             expander);
 
         var dialog = new ContentDialog

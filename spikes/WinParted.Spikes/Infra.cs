@@ -250,7 +250,7 @@ internal sealed class SpikeVhd : IDisposable
 
     public static string Folder => Path.Combine(Path.GetTempPath(), "WinPartedSpike");
 
-    public static SpikeVhd Create(Smp smp, string name, int sizeMb, Action? beforeAttach = null, bool fixedSize = false)
+    public static SpikeVhd Create(Smp smp, string name, int sizeMb, Action? beforeAttach = null, bool fixedSize = false, bool attachReadOnly = false)
     {
         Directory.CreateDirectory(Folder);
         var path = Path.Combine(Folder, $"{name}.vhdx");
@@ -267,7 +267,7 @@ internal sealed class SpikeVhd : IDisposable
         RunDiskpart($"create vdisk file=\"{path}\" maximum={sizeMb} type={type}\n");
         beforeAttach?.Invoke();
         vhd.AttachedAt = DateTime.Now;
-        RunDiskpart($"select vdisk file=\"{path}\"\nattach vdisk\n");
+        RunDiskpart($"select vdisk file=\"{path}\"\nattach vdisk{(attachReadOnly ? " readonly" : "")}\n");
         Log.Line($"Attach finished {(DateTime.Now - vhd.AttachedAt).TotalMilliseconds:F0} ms after it started.");
         vhd.Locate(TimeSpan.FromSeconds(30));
         return vhd;

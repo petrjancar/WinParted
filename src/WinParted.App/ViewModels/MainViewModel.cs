@@ -71,9 +71,6 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
     public partial ActionsView? Actions { get; set; }
 
     [ObservableProperty]
-    public partial DiskActionsView? DiskActions { get; set; }
-
-    [ObservableProperty]
     public partial bool IsLoading { get; set; } = true;
 
     [ObservableProperty]
@@ -213,9 +210,13 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
 
     public string OfflineReasonText => SelectedDisk?.OfflineReason is { } r ? $"Reason from Windows: {r}" : "";
 
-    public List<ActionItem> DiskActionItems => DiskActions?.Items.ToList() ?? [];
+    /// <summary>A partition or unallocated region is selected: the ways back to the disk view are shown (spec disk-inventory).</summary>
+    public bool HasSegmentSelected => SelectedSegment is not null;
 
-    public List<string> DiskReasonLines => DiskActions?.Reasons.Select(Presenter.ReasonSummaryText).ToList() ?? [];
+    /// <summary>Accessible name of the header's disk-name button, e.g. "Disk 1, show disk details".</summary>
+    public string ShowDiskName => string.Format(System.Globalization.CultureInfo.CurrentCulture, Core.Text.Texts.Get("Ui.ShowDiskDetailsName"), SelectedDisk?.Title ?? "");
+
+    public bool IsSelectedDiskReadOnly => SelectedDisk is { } d && _snapshot.FindDisk(d.Id)?.IsReadOnly == true;
 
     public bool DetailsLocked => Details?.IsLocked ?? false;
 
@@ -243,11 +244,10 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
 
     partial void OnActionsChanged(ActionsView? value) => OnPropertyChanged(nameof(ActionGroupList));
 
-    partial void OnDiskActionsChanged(DiskActionsView? value)
-    {
-        OnPropertyChanged(nameof(DiskActionItems));
-        OnPropertyChanged(nameof(DiskReasonLines));
-    }
+    partial void OnSelectedSegmentChanged(SegmentRef? value) => OnPropertyChanged(nameof(HasSegmentSelected));
+
+    /// <summary>Back to the disk's own details and actions (spec disk-inventory "Back to the disk view").</summary>
+    public void ShowDisk() => SelectSegment(null);
 
     /// <summary>Reloads everything (design D3) and keeps the selection when its item still exists.</summary>
     [RelayCommand]
@@ -411,7 +411,6 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
         SelectedSegment = _selection.Segment;
         Details = Presenter.Details(_snapshot, _selection);
         Actions = Presenter.Actions(_snapshot, _selection, busy);
-        DiskActions = _selection.Disk is DiskId d ? Presenter.DiskActions(_snapshot, d, busy) : null;
     }
 
     private void RaiseStateChanged()
@@ -422,6 +421,8 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
         OnPropertyChanged(nameof(IsNormalDisk));
         OnPropertyChanged(nameof(IsNotInitialized));
         OnPropertyChanged(nameof(IsOfflineDisk));
+        OnPropertyChanged(nameof(IsSelectedDiskReadOnly));
+        OnPropertyChanged(nameof(ShowDiskName));
     }
 
     private async Task RemoveLaterAsync(Toast toast)

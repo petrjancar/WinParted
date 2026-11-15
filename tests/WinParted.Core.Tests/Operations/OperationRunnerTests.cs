@@ -205,6 +205,63 @@ public class OperationRunnerTests
         Assert.Contains("Windows didn't say why.", result.Error.Details, StringComparison.Ordinal);
     }
 
+    private static (FakeStorageProvider Provider, OperationRunner Runner, ClearReadOnlyRequest Request) ReadOnlySetup()
+    {
+        var locked = new DiskBuilder(5) { Bus = BusType.Sd, IsReadOnly = true }.Vol(29 * GB, letter: 'G', fs: FileSystemKind.ExFat).Build();
+        var provider = new FakeStorageProvider { Current = Layouts.Snapshot(Layouts.Windows11Default(), locked) };
+        var target = new DiskTarget(locked.Id);
+        return (provider, new OperationRunner(provider), new ClearReadOnlyRequest(target, TargetFingerprint.Of(provider.Current, target)!));
+    }
+
+    private static StorageSnapshot Unlocked() =>
+        Layouts.Snapshot(Layouts.Windows11Default(), new DiskBuilder(5) { Bus = BusType.Sd }.Vol(29 * GB, letter: 'G', fs: FileSystemKind.ExFat).Build());
+
+    [Fact]
+    public async Task Clear_read_only_succeeds_when_the_disk_becomes_writable()
+    {
+        // spec disk-operations "Turn off read-only"
+        var (provider, runner, request) = ReadOnlySetup();
+        provider.OnExecute = _ =>
+        {
+            provider.Current = Unlocked();
+            return Task.CompletedTask;
+        };
+
+        var result = await runner.RunAsync(request);
+
+        Assert.Equal(OperationOutcome.Succeeded, result.Outcome);
+    }
+
+    [Fact]
+    public async Task Clear_read_only_that_leaves_the_disk_read_only_fails()
+    {
+        // spec disk-operations "SD card with its lock switch on": Windows reports success, the flag stays
+        var (_, runner, request) = ReadOnlySetup();
+
+        var result = await runner.RunAsync(request);
+
+        Assert.Equal(OperationOutcome.Failed, result.Outcome);
+        Assert.Equal("Disk 5 is still read-only. It's probably locked by its hardware or a Windows policy.", result.Error!.Message);
+        Assert.Equal("If it has a lock switch (like SD cards), slide it to unlocked and reconnect the disk.", result.Error.Advice);
+        Assert.False(result.Error.MayHaveChanged);
+        Assert.True(result.NothingModified);
+    }
+
+    [Fact]
+    public async Task Refused_clear_read_only_shows_the_lock_message_and_keeps_the_code()
+    {
+        // spec disk-operations "Disk image attached read-only": Windows refuses
+        var (provider, runner, request) = ReadOnlySetup();
+        provider.OnExecute = _ => throw new StorageOperationException(new StorageError("The media is write protected.", MayHaveChanged: false, Code: 19));
+
+        var result = await runner.RunAsync(request);
+
+        Assert.Equal(OperationOutcome.Failed, result.Outcome);
+        Assert.StartsWith("Disk 5 is still read-only.", result.Error!.Message, StringComparison.Ordinal);
+        Assert.Equal(19u, result.Error.Code);
+        Assert.Contains("The media is write protected.", result.Error.Details, StringComparison.Ordinal);
+    }
+
     [Fact]
     public async Task Failure_on_a_disk_still_present_keeps_the_original_error()
     {

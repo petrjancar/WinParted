@@ -13,6 +13,7 @@ public enum ActionKind
     BringOnline,
     TakeOffline,
     ClearDisk,
+    ClearReadOnly,
 
     // Unallocated region
     CreatePartition,
@@ -77,16 +78,23 @@ public static class ActionAvailability
 
     public static ImmutableArray<ActionKind> RelevantActions(StorageSnapshot snapshot, ActionTarget target) => target switch
     {
-        DiskTarget d =>
-        [
-            ActionKind.Initialize,
-            snapshot.FindDisk(d.Disk)?.IsOffline == true ? ActionKind.BringOnline : ActionKind.TakeOffline,
-            ActionKind.ClearDisk,
-        ],
+        DiskTarget d => DiskActions(snapshot.FindDisk(d.Disk)),
         UnallocatedTarget => [ActionKind.CreatePartition],
         PartitionTarget => PartitionActions,
         _ => [],
     };
+
+    /// <summary>Turn off read-only only on a read-only disk, listed first because it unblocks the others.</summary>
+    private static ImmutableArray<ActionKind> DiskActions(Disk? disk)
+    {
+        ImmutableArray<ActionKind> common =
+        [
+            ActionKind.Initialize,
+            disk?.IsOffline == true ? ActionKind.BringOnline : ActionKind.TakeOffline,
+            ActionKind.ClearDisk,
+        ];
+        return disk?.IsReadOnly == true ? common.Insert(0, ActionKind.ClearReadOnly) : common;
+    }
 
     public static ActionState Evaluate(StorageSnapshot snapshot, ActionKind kind, ActionTarget target, bool isBusy) =>
         new(kind, Check(snapshot, kind, target, isBusy));
@@ -185,9 +193,10 @@ public static class ActionAvailability
     {
         var protection = ProtectionClassifier.Classify(disk);
 
-        // Bring online writes no data, so a read-only flag doesn't block it (spec protected-storage,
-        // "Offline and read-only disk"). Dynamic and Storage Spaces disks stay fully locked.
-        var lockCheck = kind == ActionKind.BringOnline
+        // Bring online writes no data, and Turn off read-only changes only the attribute, so a
+        // read-only flag doesn't block them (spec protected-storage, "Read-only disks"). Dynamic,
+        // Storage Spaces and unverified disks stay fully locked.
+        var lockCheck = kind is ActionKind.BringOnline or ActionKind.ClearReadOnly
             ? protection with { Flags = protection.Flags & ~DiskProtectionFlags.ReadOnly }
             : protection;
         if (WholeDiskLock(lockCheck) is { } locked)
@@ -198,6 +207,7 @@ public static class ActionAvailability
         return kind switch
         {
             ActionKind.BringOnline => null,
+            ActionKind.ClearReadOnly => disk.IsReadOnly ? null : Reason.Of(ReasonCode.DiskNotReadOnly),
             ActionKind.TakeOffline => protection.IsSystemDisk ? Reason.Of(ReasonCode.SystemDisk)
                 : disk.IsRemovableMedia ? Reason.Of(ReasonCode.RemovableMediaOffline)
                 : null,
