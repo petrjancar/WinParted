@@ -83,7 +83,8 @@ Disks are ordered by disk number.
 
 - Number, friendly name, size, bus type, partition style.
 - Operational status (Online / Offline) and health status (Healthy / Warning / Unhealthy, with Windows' text).
-- Disk-level actions: **Initialize**, **Bring online / Take offline**, **Clear disk** (see section 6). Show relevant actions that are disabled, with the reason (section 7).
+- Laid out in rows: number and friendly name, then the status chips.
+- No action buttons here (changed after the MVP): disk-level actions are in the actions area (section 3.6) when the disk itself is selected, reached from a partition through the "back to the disk" link (section 3.5). An offline disk keeps its centered **Bring online** button (section 4.2).
 
 ### 3.4 Partition layout bar (custom control)
 
@@ -105,6 +106,8 @@ The visual centerpiece. A horizontal bar for the selected disk:
 ### 3.5 Details panel
 
 Shows properties of the selected item.
+
+**Back to the disk** (added after the MVP): with a partition or unallocated region selected, a breadcrumb line sits above the title: "Disk 1 › Data (D:)", where "Disk 1" is a link back to the disk's details and actions. The same happens when the user clicks the disk in the disk list (also the selected one) or the disk's name in the header (clickable only while a segment is selected; looks like the heading, with a hover highlight, tooltip "Show disk details", announced as "Disk 1, show disk details"), or presses Escape anywhere in the window (not while a dialog is open or in a text field). The layout's screen-reader hint: "Partitions. Use the Left and Right arrow keys to move, Enter to go to actions, Escape to show the disk."
 
 **Partition:**
 - Title (as on the segment) and plain-language role description (e.g. "Windows needs this to start").
@@ -155,7 +158,7 @@ A **Refresh** button (and F5) reloads all information. Selection is kept if the 
 | **System disk** | Badge "System disk". Initialize, Clear, Take offline disabled. Unprotected partitions and free space on it are still editable. |
 | **Not initialized** | No layout; instead an empty-state panel: "This disk isn't set up yet." + **Initialize** as primary action. Clear disk stays visible but disabled ("This disk is already empty."). |
 | **Offline** | Layout replaced with "This disk is offline. Its volumes aren't available in Windows." + Windows' offline reason if any (e.g. "Policy", "Signature collision") + **Bring online** as primary action. |
-| **Read-only** | Badge "Read-only". Every modifying action disabled. Typical case: SD card with write-protect switch. Exception: if the disk is also **offline**, Bring online stays available (it writes no data); once online, the disk shows the normal read-only state. |
+| **Read-only** | Badge "Read-only". Every modifying action disabled except **Turn off read-only** (section 6.12), listed first in the disk actions. Typical case: SD card with write-protect switch. If the disk is also **offline**, Bring online stays available too (it writes no data), and the offline panel shows **Turn off read-only** next to it; once online, the disk shows the normal read-only state. Turn off read-only is never shown on a writable disk. |
 | **Health warning / unhealthy** | Warning badge + Windows' health text. Actions still allowed (subject to other rules), but the user should notice. |
 | **Managed by Windows** (dynamic disk, Storage Spaces) | Lock badge + "Managed by Storage Spaces" / "Dynamic disk - managed by Disk Management". Everything read-only. |
 | **Busy** | Operation running on this disk; progress shown (section 8). |
@@ -196,7 +199,7 @@ Protected items are **always visible**, carry a **lock badge** and a **one-line 
 | Dynamic disk (whole) | "Dynamic disk - managed by Disk Management" | none |
 | Storage Spaces member (whole) | "Managed by Storage Spaces" | none |
 | System disk (disk level) | "System disk - Windows is installed on this disk" | disk-level: none; partition-level: per item |
-| Read-only disk (whole) | "This disk is write-protected" | none |
+| Read-only disk (whole) | "This disk is write-protected" | Turn off read-only (disk) |
 
 ---
 
@@ -322,6 +325,16 @@ All modifying operations use a dialog (ContentDialog or similar). Common rules:
 - Body: "Formatting Data (D:) is still in progress. Closing WinParted will not stop it. Windows will finish it in the background, but you won't see the result here."
 - Buttons: **Keep WinParted open** (default), **Close anyway**.
 
+### 6.12 Turn off read-only (added after the MVP)
+
+- Shown only on a read-only disk, online or offline. Disabled on a dynamic or Storage Spaces disk with that disk's usual reason.
+- Title: "Turn off read-only for Disk 4?"
+- Identity line as in the other disk dialogs: "Disk 4 · Msft Virtual Disk · 64.0 GB".
+- Body: "Windows and programs will be able to change this disk and its volumes again. The read-only flag may have been set on purpose, by Windows or another tool. No data is changed."
+- Primary: **Turn off read-only** (non-destructive style; Enter confirms). **Cancel** leaves the disk read-only.
+- Success notification: "Disk 4 is no longer read-only."
+- Still read-only afterwards (lock switch, write-protected hardware, disk image attached read-only, Windows policy): the operation's error (section 8) with the message in 8.1. The disk keeps its Read-only badge.
+
 ---
 
 ## 7. Disabled-action reasons (copy)
@@ -333,7 +346,7 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 | Situation | Reason text |
 |---|---|
 | Another operation running | "Another operation is in progress. Wait for it to finish." |
-| Disk is read-only | "This disk is write-protected. If it has a lock switch, turn it off." |
+| Disk is read-only | "This disk is read-only. Use Turn off read-only to make it writable; if it has a lock switch, unlock it first." |
 | Dynamic disk | "This is a dynamic disk. WinParted can't change dynamic disks. Use Disk Management." |
 | Storage Spaces | "Managed by Storage Spaces. Use Storage Spaces in Settings to change it." |
 | Disk offline | "This disk is offline. Bring it online first." |
@@ -390,6 +403,7 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 | Case | Message |
 |---|---|
 | Disk is read-only (became so during the dialog) | "Disk 2 is write-protected. Nothing was changed." |
+| Still read-only after Turn off read-only | "Disk 4 is still read-only. It's probably locked by its hardware or a Windows policy. If it has a lock switch (like SD cards), slide it to unlocked and reconnect the disk. Nothing was changed." |
 | Access denied | "Windows denied access to this disk. Nothing was changed." |
 | Not enough space / size not supported | "Windows couldn't resize the volume to that size. Nothing was changed. Try a smaller change." |
 | Target changed before running | "This disk was disconnected or changed. Nothing was modified." |
@@ -455,7 +469,7 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 
 An **About** entry (version, MIT license, GitHub link) is in scope but can be minimal.
 
-Update checks and the extended About dialog came after the MVP: see [installer-and-updates.md](installer-and-updates.md).
+Update checks and the extended About dialog came after the MVP: see [installer-and-updates.md](installer-and-updates.md). So did Turn off read-only (section 6.12).
 
 ---
 
