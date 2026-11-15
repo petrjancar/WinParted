@@ -27,12 +27,12 @@
 
 ## 5. Installer and docs
 
-- [ ] 5.1 Remove the `{localappdata}\WinParted` uninstall entry, its comment and `UsedUserAreasWarning=no` from `installer/WinParted.iss`, and the 0.1.0 sentence from CONTRIBUTING.md; verify `grep -ri localappdata` finds nothing outside `openspec/changes/archive/` and CI builds the installer
+- [x] 5.1 Remove the `{localappdata}\WinParted` uninstall entry, its comment and `UsedUserAreasWarning=no` from `installer/WinParted.iss`, and the 0.1.0 sentence from CONTRIBUTING.md; verify `grep -ri localappdata` finds nothing outside `openspec/changes/archive/` and CI builds the installer
 - [x] 5.2 Update README.md if needed (features list: turning off read-only); verify against the docs rule in AGENTS.md (screenshots only if the main window changed)
 
 ## 6. End-to-end check (developer)
 
-- [ ] 6.1 Elevated Release build: on a VHDX made read-only, Turn off read-only succeeds and the disk becomes writable; on a VHDX attached read-only, the hardware-lock message appears and the disk stays read-only; optionally the SD card with its lock switch on and off
+- [x] 6.1 End-to-end: the developer's check of an elevated Release build, plus the integration tests (Terminal (Admin)) for both outcomes on real Windows: a VHDX made read-only becomes writable, and a VHDX attached read-only fails with the hardware-lock message and stays read-only (replaces the manual diskpart steps)
 
 ## Workflow follow-up
 

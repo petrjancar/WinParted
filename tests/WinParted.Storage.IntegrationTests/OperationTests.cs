@@ -65,6 +65,25 @@ public sealed class OperationTests : IDisposable
         Assert.Contains((await _vhd.DiskAsync()).Partitions, p => p.Volume?.Label == "WRITABLE");
     }
 
+    [AdminFact]
+    public async Task Turn_off_read_only_on_an_image_attached_read_only_reports_still_read_only()
+    {
+        // spec disk-operations "Disk image attached read-only": Windows returns success but the disk
+        // stays read-only (spike, smp-behavior.md); the runner's re-read turns that into the failure.
+        using var locked = TestVhd.Create("ro-attached", 256, _provider, attachReadOnly: true);
+        var disk = await locked.DiskAsync();
+        Assert.True(disk.IsReadOnly);
+
+        var snapshot = await locked.SnapshotAsync();
+        var target = new DiskTarget(locked.Id);
+        var result = await new OperationRunner(_provider).RunAsync(new ClearReadOnlyRequest(target, TestVhd.Fingerprint(snapshot, target)));
+
+        Assert.Equal(OperationOutcome.Failed, result.Outcome);
+        Assert.StartsWith($"Disk {disk.Number} is still read-only.", result.Error!.Message, StringComparison.Ordinal);
+        Assert.False(result.Error.MayHaveChanged);
+        Assert.True((await locked.DiskAsync()).IsReadOnly);
+    }
+
     // ----- 7.1 reading ------------------------------------------------------------------------
 
     [AdminFact]

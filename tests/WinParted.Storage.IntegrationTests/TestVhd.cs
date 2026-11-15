@@ -51,11 +51,12 @@ public sealed class TestVhd : IDisposable
     /// <summary>When diskpart finished attaching (for event latency checks).</summary>
     public DateTime AttachedAt { get; private set; }
 
-    public static TestVhd Create(string name, int sizeMb, SmpStorageProvider provider)
+    /// <param name="attachReadOnly">Attach the image read-only: Windows then reports the disk as read-only.</param>
+    public static TestVhd Create(string name, int sizeMb, SmpStorageProvider provider, bool attachReadOnly = false)
     {
         Directory.CreateDirectory(Folder);
         var path = Path.Combine(Folder, $"{name}-{Guid.NewGuid():N}.vhdx");
-        RunDiskpart($"create vdisk file=\"{path}\" maximum={sizeMb} type=expandable\nattach vdisk\n");
+        RunDiskpart($"create vdisk file=\"{path}\" maximum={sizeMb} type=expandable\nattach vdisk{(attachReadOnly ? " readonly" : "")}\n");
         var vhd = new TestVhd(path, sizeMb, provider) { AttachedAt = DateTime.UtcNow };
         vhd.Id = vhd.Locate();
         return vhd;

@@ -6,7 +6,7 @@
 
 A free, open-source disk and partition manager for Windows 11 with a modern, native UI.
 
-> **Status:** early development. WinParted changes real disks, so back up anything important first.
+> Back up anything important before you change partitions.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/screenshot-dark.png">
