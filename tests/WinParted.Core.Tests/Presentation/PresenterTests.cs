@@ -145,18 +145,6 @@ public class PresenterTests
     }
 
     [Fact]
-    public void Disk_actions_share_one_reason_line()
-    {
-        // Reasons board, example 2.
-        var disk = Layouts.Windows11Default();
-        var view = Presenter.DiskActions(Layouts.Snapshot(disk), disk.Id, false);
-
-        Assert.Equal(["Initialize", "Take offline", "Clear disk"], view.Items.Select(i => i.Label));
-        var summary = Assert.Single(view.Reasons);
-        Assert.Equal("Initialize, Take offline and Clear disk: Windows is installed on this disk.", Presenter.ReasonSummaryText(summary));
-    }
-
-    [Fact]
     public void Join_and()
     {
         Assert.Equal("", Presenter.JoinAnd([]));

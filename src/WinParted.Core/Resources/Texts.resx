@@ -16,7 +16,7 @@
   <!-- Disabled-action reasons (docs/design/mvp-features.md section 7). {n} are placeholders. -->
   <data name="Reason.OperationInProgress" xml:space="preserve"><value>Another operation is in progress. Wait for it to finish.</value></data>
   <data name="Reason.TargetChanged" xml:space="preserve"><value>This disk was disconnected or changed. Nothing was modified.</value></data>
-  <data name="Reason.DiskReadOnly" xml:space="preserve"><value>This disk is write-protected. If it has a lock switch, turn it off.</value></data>
+  <data name="Reason.DiskReadOnly" xml:space="preserve"><value>This disk is read-only. Use Turn off read-only to make it writable; if it has a lock switch, unlock it first.</value></data>
   <data name="Reason.DynamicDisk" xml:space="preserve"><value>This is a dynamic disk. WinParted can't change dynamic disks. Use Disk Management.</value></data>
   <data name="Reason.StorageSpaces" xml:space="preserve"><value>Managed by Storage Spaces. Use Storage Spaces in Settings to change it.</value></data>
   <data name="Reason.DiskOffline" xml:space="preserve"><value>This disk is offline. Bring it online first.</value></data>
@@ -185,6 +185,7 @@
   <data name="Ui.Action.BringOnline" xml:space="preserve"><value>Bring online</value></data>
   <data name="Ui.Action.TakeOffline" xml:space="preserve"><value>Take offline</value></data>
   <data name="Ui.Action.ClearDisk" xml:space="preserve"><value>Clear disk</value></data>
+  <data name="Ui.Action.ClearReadOnly" xml:space="preserve"><value>Turn off read-only</value></data>
   <data name="Ui.Action.CreatePartition" xml:space="preserve"><value>Create partition</value></data>
   <data name="Ui.Action.FormatVolume" xml:space="preserve"><value>Format</value></data>
   <data name="Ui.Action.DeletePartition" xml:space="preserve"><value>Delete</value></data>
@@ -197,7 +198,6 @@
   <data name="Ui.Group.Contents" xml:space="preserve"><value>Contents</value></data>
   <data name="Ui.Group.Size" xml:space="preserve"><value>Size</value></data>
   <data name="Ui.Group.NameAndLetter" xml:space="preserve"><value>Name and drive letter</value></data>
-  <data name="Ui.ReasonSummary" xml:space="preserve"><value>{0}: {1}</value></data>
   <data name="Ui.ListAnd" xml:space="preserve"><value>{0} and {1}</value></data>
   <data name="Ui.Toast.Connected" xml:space="preserve"><value>{0} disk connected: {1} ({2})</value></data>
   <data name="Ui.Toast.Disconnected" xml:space="preserve"><value>Disk {0} was disconnected</value></data>
@@ -295,6 +295,8 @@
   <data name="Busy.BringOnline" xml:space="preserve"><value>Bringing Disk {0} online</value></data>
   <data name="Busy.TakeOffline" xml:space="preserve"><value>Taking Disk {0} offline</value></data>
   <data name="Busy.ClearDisk" xml:space="preserve"><value>Clearing Disk {0}</value></data>
+  <data name="Busy.ClearReadOnly" xml:space="preserve"><value>Turning off read-only for Disk {0}</value></data>
+  <data name="Done.ClearReadOnly" xml:space="preserve"><value>Disk {0} is no longer read-only.</value></data>
   <data name="Busy.CreatePartition" xml:space="preserve"><value>Creating a partition on Disk {0}</value></data>
   <data name="Busy.DeletePartition" xml:space="preserve"><value>Deleting {0}</value></data>
   <data name="Busy.FormatVolume" xml:space="preserve"><value>Formatting {0}</value></data>
@@ -351,4 +353,13 @@
   <data name="About.NeedsAdmin" xml:space="preserve"><value>Restart WinParted as administrator to change these settings.</value></data>
   <data name="About.On" xml:space="preserve"><value>On</value></data>
   <data name="About.Off" xml:space="preserve"><value>Off</value></data>
+  <data name="Reason.DiskNotReadOnly" xml:space="preserve"><value>This disk isn't read-only.</value></data>
+  <data name="Dlg.ClearReadOnly.Title" xml:space="preserve"><value>Turn off read-only for Disk {0}?</value></data>
+  <data name="Dlg.ClearReadOnly.Body" xml:space="preserve"><value>Windows and programs will be able to change this disk and its volumes again. The read-only flag may have been set on purpose, by Windows or another tool. No data is changed.</value></data>
+  <data name="Dlg.ClearReadOnly.Primary" xml:space="preserve"><value>Turn off read-only</value></data>
+  <data name="Error.StillReadOnly" xml:space="preserve"><value>Disk {0} is still read-only. It's probably locked by its hardware or a Windows policy.</value></data>
+  <data name="Error.StillReadOnly.Action" xml:space="preserve"><value>If it has a lock switch (like SD cards), slide it to unlocked and reconnect the disk.</value></data>
+  <data name="Ui.ShowDiskDetails" xml:space="preserve"><value>Show disk details</value></data>
+  <data name="Ui.ShowDiskDetailsName" xml:space="preserve"><value>{0}, show disk details</value></data>
+  <data name="Ui.LayoutBar.Name" xml:space="preserve"><value>Partitions. Use the Left and Right arrow keys to move, Enter to go to actions, Escape to show the disk.</value></data>
 </root>

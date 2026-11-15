@@ -10,6 +10,9 @@ public static class Ui
 {
     public static Brush Resource(string key) => (Brush)Application.Current.Resources[key];
 
+    /// <summary>A text from Texts.resx, for XAML (all user-facing text lives there).</summary>
+    public static string Text(string key) => Core.Text.Texts.Get(key);
+
     /// <summary>
     /// Copies text and confirms it in place: the button shows "Copied" (a check mark for icon buttons) for two
     /// seconds and screen readers announce it. No notification, which would be too loud for a copy.
@@ -122,6 +125,7 @@ public static class Ui
         Core.Actions.ActionKind.Initialize => "",
         Core.Actions.ActionKind.BringOnline or Core.Actions.ActionKind.TakeOffline => "",
         Core.Actions.ActionKind.ClearDisk => "",
+        Core.Actions.ActionKind.ClearReadOnly => "",
         Core.Actions.ActionKind.CreatePartition => "",
         Core.Actions.ActionKind.FormatVolume => "",
         Core.Actions.ActionKind.DeletePartition => "",

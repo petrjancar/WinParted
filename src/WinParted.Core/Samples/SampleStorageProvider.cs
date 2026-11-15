@@ -56,19 +56,22 @@ public sealed class SampleStorageProvider : IStorageProvider
                 .Build(),
             new Builder(3, PartitionStyle.Uninitialized, "Generic SD/MMC", BusType.Sd) { Location = "SD card reader" }
                 .Build(totalSize: (ulong)(29.7 * GB)),
-            new Builder(4, PartitionStyle.Gpt, "Msft Virtual Disk", BusType.Virtual) { Offline = "Policy", Location = @"C:\VMs\scratch.vhdx" }
+            new Builder(4, PartitionStyle.Gpt, "Msft Virtual Disk", BusType.Virtual) { Offline = "Policy", ReadOnly = true, Location = @"C:\VMs\scratch.vhdx" }
                 .Vol(60 * GB, label: "Scratch", used: 12 * GB)
                 .Build(totalSize: 64 * GB),
             new Builder(5, PartitionStyle.Gpt, "Crucial MX500 500GB", BusType.Sata) { Serial = "2233E6A1B2C3" }
                 .Vol(200 * GB, label: "Vault", letter: 'F', used: 80 * GB, bitLocker: BitLockerState.Locked)
                 .Vol(265 * GB, label: "Photos", letter: 'G', used: 90 * GB, bitLocker: BitLockerState.Unlocked)
                 .Build(),
+            new Builder(6, PartitionStyle.Mbr, "Lexar SDXC Card", BusType.Sd) { ReadOnly = true, Removable = true, Location = "SD card reader" }
+                .Vol((ulong)(59.4 * GB) - MB, label: "PHOTOS", letter: 'H', fs: FileSystemKind.ExFat, used: (ulong)(23.8 * GB))
+                .Build(),
         };
 
         return new StorageSnapshot
         {
             Disks = [.. disks],
-            Facts = new SystemFacts { UsedDriveLetters = ['C', 'D', 'E', 'F', 'G'] },
+            Facts = new SystemFacts { UsedDriveLetters = ['C', 'D', 'E', 'F', 'G', 'H'] },
         };
     }
 
@@ -87,6 +90,8 @@ public sealed class SampleStorageProvider : IStorageProvider
         public string? Offline { get; init; }
 
         public bool Removable { get; init; }
+
+        public bool ReadOnly { get; init; }
 
         public Builder Part(ulong size, Guid gptType)
         {
@@ -163,6 +168,7 @@ public sealed class SampleStorageProvider : IStorageProvider
             IsSystem = System,
             IsBoot = System,
             IsOffline = Offline is not null,
+            IsReadOnly = ReadOnly,
             IsRemovableMedia = Removable,
             OfflineReason = Offline,
             Partitions = [.. _partitions],

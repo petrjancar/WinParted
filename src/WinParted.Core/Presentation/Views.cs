@@ -106,9 +106,5 @@ public sealed record ActionItem(ActionKind Kind, string Label, bool IsEnabled, s
 
 public sealed record ActionGroup(string Name, ImmutableArray<ActionItem> Items);
 
-/// <summary>Disabled disk actions sharing a reason, shown as one line ("Initialize and Clear disk: ...").</summary>
-public sealed record ReasonSummary(string Labels, string Reason);
-
 public sealed record ActionsView(string Title, ImmutableArray<ActionGroup> Groups);
 
-public sealed record DiskActionsView(ImmutableArray<ActionItem> Items, ImmutableArray<ReasonSummary> Reasons);

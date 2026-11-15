@@ -69,6 +69,21 @@ public class DialogModelTests
     }
 
     [Fact]
+    public void Clear_read_only_dialog()
+    {
+        // spec disk-operations "Confirmation explains the change"; brief 6.12
+        var disk = new DiskBuilder(4) { IsReadOnly = true }.Vol(64 * GB, letter: 'V').Build();
+        var model = new ClearReadOnlyDialogModel(Layouts.Snapshot(disk), disk);
+
+        Assert.Equal("Turn off read-only for Disk 4?", model.Title);
+        Assert.Equal("Turn off read-only", model.PrimaryText);
+        Assert.Contains("set on purpose", model.Body, StringComparison.Ordinal);
+        Assert.False(model.IsDestructive);
+        Assert.True(model.EnterConfirms);
+        Assert.IsType<ClearReadOnlyRequest>(model.Request());
+    }
+
+    [Fact]
     public void Create_dialog_defaults_and_size_validation()
     {
         var disk = Layouts.DataDiskWithLinux();

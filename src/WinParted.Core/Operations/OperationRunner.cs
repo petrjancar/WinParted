@@ -94,6 +94,10 @@ public sealed class OperationRunner(IStorageProvider provider)
             {
                 error = DiskRemoved(request, error);
             }
+            else if (request is ClearReadOnlyRequest && after?.FindDisk(DiskOf(request.Target)) is { IsReadOnly: true } stillLocked)
+            {
+                error = StillReadOnly(stillLocked, error);
+            }
 
             return error is null
                 ? new OperationResult(OperationOutcome.Succeeded, Snapshot: after)
@@ -128,6 +132,24 @@ public sealed class OperationRunner(IStorageProvider provider)
             MayHaveChanged: true,
             original.Code,
             details);
+    }
+
+    /// <summary>
+    /// Spec disk-operations "Read-only by hardware" (design D2): whether Windows refused or reported success,
+    /// a disk that is still read-only afterwards is locked by its hardware or a policy. Windows' own
+    /// error, if any, stays in the technical details.
+    /// </summary>
+    private static StorageError StillReadOnly(Disk disk, StorageError? original)
+    {
+        var details = original is null
+            ? "Windows reported success, but the disk is still read-only."
+            : string.Join(Environment.NewLine, new[] { original.Message, original.Details }.Where(t => !string.IsNullOrEmpty(t)));
+        return new StorageError(
+            string.Format(System.Globalization.CultureInfo.CurrentCulture, Text.Texts.Get("Error.StillReadOnly"), disk.Number),
+            MayHaveChanged: false,
+            original?.Code,
+            details,
+            Text.Texts.Get("Error.StillReadOnly.Action"));
     }
 
     private async Task<StorageSnapshot?> TryReadSnapshotAsync()

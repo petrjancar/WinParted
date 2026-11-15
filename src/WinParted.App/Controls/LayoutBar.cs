@@ -114,7 +114,7 @@ public sealed class LayoutBar : UserControl
             _bar.Children.Add(button);
         }
 
-        AutomationProperties.SetName(_bar, "Partitions. Use the Left and Right arrow keys to move, Enter to go to actions.");
+        AutomationProperties.SetName(_bar, Core.Text.Texts.Get("Ui.LayoutBar.Name"));
         _scaleHint.Text = notToScale ? Core.Text.Texts.Get("Ui.Bar.NotToScale") : "";
         _scaleEnd.Text = DiskSizeText;
     }

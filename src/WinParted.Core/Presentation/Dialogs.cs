@@ -147,6 +147,20 @@ public sealed class InitializeDialogModel(StorageSnapshot snapshot, Disk disk) :
     public OperationRequest Request(PartitionStyle style) => new InitializeDiskRequest((DiskTarget)Target, Fingerprint, style);
 }
 
+/// <summary>Turn off read-only (mvp-features.md 6.12): not destructive, Enter confirms.</summary>
+public sealed class ClearReadOnlyDialogModel(StorageSnapshot snapshot, Disk disk) : DialogModel(snapshot, new DiskTarget(disk.Id))
+{
+    public override string Title => Dialogs.F("Dlg.ClearReadOnly.Title", disk.Number);
+
+    public override string PrimaryText => Dialogs.T("Dlg.ClearReadOnly.Primary");
+
+    public string IdentityText => Identity(disk);
+
+    public string Body => Dialogs.T("Dlg.ClearReadOnly.Body");
+
+    public OperationRequest Request() => new ClearReadOnlyRequest((DiskTarget)Target, Fingerprint);
+}
+
 public sealed class OfflineDialogModel(StorageSnapshot snapshot, Disk disk) : DialogModel(snapshot, new DiskTarget(disk.Id))
 {
     public override string Title => Dialogs.F("Dlg.Offline.Title", disk.Number);

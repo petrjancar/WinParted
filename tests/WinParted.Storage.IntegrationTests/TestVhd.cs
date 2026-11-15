@@ -51,11 +51,12 @@ public sealed class TestVhd : IDisposable
     /// <summary>When diskpart finished attaching (for event latency checks).</summary>
     public DateTime AttachedAt { get; private set; }
 
-    public static TestVhd Create(string name, int sizeMb, SmpStorageProvider provider)
+    /// <param name="attachReadOnly">Attach the image read-only: Windows then reports the disk as read-only.</param>
+    public static TestVhd Create(string name, int sizeMb, SmpStorageProvider provider, bool attachReadOnly = false)
     {
         Directory.CreateDirectory(Folder);
         var path = Path.Combine(Folder, $"{name}-{Guid.NewGuid():N}.vhdx");
-        RunDiskpart($"create vdisk file=\"{path}\" maximum={sizeMb} type=expandable\nattach vdisk\n");
+        RunDiskpart($"create vdisk file=\"{path}\" maximum={sizeMb} type=expandable\nattach vdisk{(attachReadOnly ? " readonly" : "")}\n");
         var vhd = new TestVhd(path, sizeMb, provider) { AttachedAt = DateTime.UtcNow };
         vhd.Id = vhd.Locate();
         return vhd;
@@ -90,6 +91,21 @@ public sealed class TestVhd : IDisposable
 
         Validate(snapshot.FindDisk(Id)!);
         await Provider.ExecuteAsync(request, progress);
+    }
+
+    /// <summary>Makes this VHDX read-only (MSFT_Disk.SetAttributes), after the guard. Test setup only.</summary>
+    public async Task SetReadOnlyAsync()
+    {
+        Validate(await DiskAsync());
+        using var session = CimSession.Create(null);
+        var disk = session.QueryInstances(@"root\Microsoft\Windows\Storage", "WQL", "SELECT * FROM MSFT_Disk")
+            .Single(d => d.CimInstanceProperties["ObjectId"]?.Value as string == Id.Value);
+        var args = new CimMethodParametersCollection { CimMethodParameter.Create("IsReadOnly", true, CimType.Boolean, CimFlags.In) };
+        var result = session.InvokeMethod(@"root\Microsoft\Windows\Storage", disk, "SetAttributes", args);
+        if (Convert.ToUInt32(result.ReturnValue.Value) != 0)
+        {
+            throw new InvalidOperationException($"SetAttributes(IsReadOnly=true) returned {result.ReturnValue.Value}.");
+        }
     }
 
     public static TargetFingerprint Fingerprint(StorageSnapshot s, ActionTarget t) =>

@@ -1,9 +1,9 @@
 using WinParted.Spikes;
 
 var command = args.FirstOrDefault()?.ToLowerInvariant() ?? "help";
-var needsAdmin = command is "usb" or "behavior" or "progress" or "events" or "fullformat" or "vhd" or "all" or "cleanup";
+var needsAdmin = command is "readonly" or "readonly-card" or "usb" or "behavior" or "progress" or "events" or "fullformat" or "vhd" or "all" or "cleanup";
 
-if (command is not ("usb" or "usb-check" or "facts" or "behavior" or "progress" or "events" or "fullformat" or "vhd" or "all" or "cleanup"))
+if (command is not ("readonly" or "readonly-card" or "usb" or "usb-check" or "facts" or "behavior" or "progress" or "events" or "fullformat" or "vhd" or "all" or "cleanup"))
 {
     Console.WriteLine("""
         WinParted spikes. Run from Terminal (Admin) in the repository folder:
@@ -12,6 +12,8 @@ if (command is not ("usb" or "usb-check" or "facts" or "behavior" or "progress" 
           dotnet run --project spikes/WinParted.Spikes -- behavior   MBR limits and error codes (temporary VHDX only)
           dotnet run --project spikes/WinParted.Spikes -- progress   format/resize progress (temporary VHDX only)
           dotnet run --project spikes/WinParted.Spikes -- events     hot-plug events (VHDX, then optional USB stick)
+          dotnet run --project spikes/WinParted.Spikes -- readonly   read-only flag: set/clear online and offline, read-only attach (temporary VHDX only)
+          dotnet run --project spikes/WinParted.Spikes -- readonly-card  optional: try to clear the flag on ONE locked SD card/USB stick, then restore it
           dotnet run --project spikes/WinParted.Spikes -- fullformat full format on fixed vs expandable VHDX, drive-letter cleanup
           dotnet run --project spikes/WinParted.Spikes -- usb-check  read-only: shows which USB disk the usb test would erase
           dotnet run --project spikes/WinParted.Spikes -- usb        ERASES the single connected USB stick: quick/full format tests
@@ -49,6 +51,8 @@ foreach (var c in commands)
             case "progress": ProgressSpike.Run(smp); break;
             case "events": EventsSpike.Run(smp); break;
             case "fullformat": FullFormatSpike.Run(smp); break;
+            case "readonly": ReadOnlySpike.Run(smp); break;
+            case "readonly-card": ReadOnlySpike.RunCard(smp); break;
             case "usb-check": UsbFormatSpike.Check(smp); break;
             case "usb": UsbFormatSpike.Run(smp); break;
             case "cleanup": SpikeVhd.CleanupAll(); break;

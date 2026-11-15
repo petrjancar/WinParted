@@ -6,7 +6,7 @@
 
 A free, open-source disk and partition manager for Windows 11 with a modern, native UI.
 
-> **Status:** early development. WinParted changes real disks, so back up anything important first.
+> Back up anything important before you change partitions.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/screenshot-dark.png">
@@ -16,7 +16,7 @@ A free, open-source disk and partition manager for Windows 11 with a modern, nat
 ## Features
 
 - **See your disks:** health, bus type and partition style of every disk, a visual partition map, and used and free space per volume. Updates when you plug in or remove a drive.
-- **Disk operations:** initialize (GPT or MBR), bring online or take offline, clear disk.
+- **Disk operations:** initialize (GPT or MBR), bring online or take offline, clear disk, turn off read-only.
 - **Partition operations:** create (and format), delete, format, shrink and extend, change drive letter and label.
 - **Safe by design:** system partitions (EFI, Recovery, the Windows volume and others) are shown but locked, every unavailable action tells you why, and destructive changes ask for confirmation first.
 

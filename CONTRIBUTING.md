@@ -44,7 +44,7 @@ Developer options:
 
 ## Files at runtime
 
-WinParted writes only to `%ProgramData%\WinParted`: `settings.json` and the diagnostic log `winparted.log` (the `WINPARTED_LOG` environment variable overrides the log path). The uninstaller removes that folder, and also `%LOCALAPPDATA%\WinParted`, where 0.1.0 kept its log.
+WinParted writes only to `%ProgramData%\WinParted`: `settings.json` and the diagnostic log `winparted.log` (the `WINPARTED_LOG` environment variable overrides the log path). The uninstaller removes that folder.
 
 ## Releasing
 

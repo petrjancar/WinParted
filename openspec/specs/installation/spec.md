@@ -49,17 +49,6 @@ WinParted SHALL be uninstallable from Settings → Apps → Installed apps and f
 - **WHEN** the user uninstalls WinParted from Settings → Apps and approves the elevation prompt
 - **THEN** WinParted is removed and no longer appears in Installed apps or the Start menu
 
-### Requirement: Uninstall leaves no files
-Uninstalling SHALL remove everything WinParted created on the PC: the installation folder, Start menu entries, the installed-apps registration, the app data folder with settings and the diagnostic log, and the per-user data folder left by version 0.1.0 for the account that runs the uninstaller. It SHALL NOT remove anything else, and it SHALL NOT change any disk, partition or volume.
-
-#### Scenario: Nothing left behind
-- **WHEN** a user installs WinParted, runs it (creating settings and a log), and then uninstalls it
-- **THEN** none of these exist any more: `Program Files\WinParted`, the WinParted Start menu entries, the WinParted app data folder, and WinParted's installed-apps registry entry
-
-#### Scenario: Data from 0.1.0
-- **WHEN** a user who ran the 0.1.0 zip (which wrote `%LOCALAPPDATA%\WinParted`) installs a later version and later uninstalls it
-- **THEN** `%LOCALAPPDATA%\WinParted` of that user is removed too
-
 ### Requirement: One machine-wide data folder
 WinParted SHALL keep all files it creates at runtime (settings and the diagnostic log) in a single machine-wide folder, the same for every user account and for both the installed app and the portable zip. It SHALL NOT write anywhere else, except the files the user explicitly saves.
 
@@ -73,3 +62,10 @@ Each release SHALL still provide the portable zip. It SHALL run without installa
 #### Scenario: Portable use
 - **WHEN** a user extracts the zip and runs `WinParted.exe`
 - **THEN** WinParted runs with the same features as the installed app, and nothing appears in Installed apps or the Start menu
+
+### Requirement: Uninstall removes everything WinParted created
+Uninstalling SHALL remove everything WinParted creates on the PC: the installation folder, Start menu entries, the installed-apps registration, and the app data folder with settings and the diagnostic log. It SHALL NOT remove anything else, and it SHALL NOT change any disk, partition or volume.
+
+#### Scenario: Nothing left behind
+- **WHEN** a user installs WinParted, runs it (creating settings and a log), and then uninstalls it
+- **THEN** none of these exist any more: `Program Files\WinParted`, the WinParted Start menu entries, the WinParted app data folder, and WinParted's installed-apps registry entry

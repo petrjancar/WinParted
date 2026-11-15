@@ -16,6 +16,8 @@ public static class Win {
     [DllImport("user32.dll")] public static extern bool SetProcessDpiAwarenessContext(IntPtr v);
     [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr h);
     [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
+    [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
+    [DllImport("user32.dll")] public static extern void mouse_event(uint f, uint x, uint y, uint d, IntPtr e);
     [DllImport("dwmapi.dll")] public static extern int DwmGetWindowAttribute(IntPtr h, int a, out RECT r, int s);
 }
 "@
@@ -29,6 +31,14 @@ function Capture($theme, $out) {
         Start-Sleep 8
         $h = $p.MainWindowHandle
         [Win]::SetForegroundWindow($h) | Out-Null; Start-Sleep -Milliseconds 800
+
+        # Activating the window this way shows keyboard focus rings; a click on the plain "Disks" label
+        # (pointer input, changes nothing) hides them, as for a mouse user. The cursor is then moved away.
+        $vis0 = New-Object Win+RECT; [Win]::DwmGetWindowAttribute($h, 9, [ref]$vis0, 16) | Out-Null
+        $scale = [Win]::GetDpiForWindow($h) / 96.0
+        [Win]::SetCursorPos($vis0.L + [int](40 * $scale), $vis0.T + [int](72 * $scale)) | Out-Null
+        [Win]::mouse_event(2, 0, 0, 0, [IntPtr]::Zero); [Win]::mouse_event(4, 0, 0, 0, [IntPtr]::Zero)
+        [Win]::SetCursorPos($vis0.R + 50, $vis0.B + 50) | Out-Null; Start-Sleep -Milliseconds 600
 
         # Render the window itself (PW_RENDERFULLCONTENT), then crop to the visible frame.
         $win = New-Object Win+RECT; [Win]::GetWindowRect($h, [ref]$win) | Out-Null
