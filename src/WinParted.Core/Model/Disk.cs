@@ -29,6 +29,12 @@ public sealed class Disk
 
     public bool IsOffline { get; init; }
 
+    /// <summary>
+    /// A drive with no medium in it, such as an empty card reader slot (SMP <c>OperationalStatus</c>
+    /// 0xD012 or size 0). Windows reports it offline, but that's a side effect of having no media.
+    /// </summary>
+    public bool HasNoMedia { get; init; }
+
     /// <summary>Windows' reason for the disk being offline (e.g. "Policy"), if any.</summary>
     public string? OfflineReason { get; init; }
 

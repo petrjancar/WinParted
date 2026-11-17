@@ -15,7 +15,8 @@ public static class ChangeMessages
         var messages = new List<string>();
         foreach (var added in after.Disks.Where(d => before.FindDisk(d.Id) is null))
         {
-            messages.Add(F("Ui.Toast.Connected", Presenter.Bus(added.Bus), added.FriendlyName, SizeFormatter.Format(added.Size)));
+            messages.Add(F("Ui.Toast.Connected", Presenter.Bus(added.Bus), added.FriendlyName,
+                added.HasNoMedia ? Texts.Get("Ui.Toast.NoMedia") : SizeFormatter.Format(added.Size)));
         }
 
         foreach (var removed in before.Disks.Where(d => after.FindDisk(d.Id) is null))

@@ -57,6 +57,14 @@
   <data name="Error.PartitionLimit" xml:space="preserve"><value>This disk can't hold more partitions. Nothing was changed.</value></data>
   <data name="Error.FullFormatNotSupported" xml:space="preserve"><value>Windows can't do a full format here. Nothing was changed. Use quick format instead.</value></data>
   <data name="Error.CreatedButFormatFailed" xml:space="preserve"><value>The partition was created, but formatting failed. It's shown as Unformatted. You can try formatting it again.</value></data>
+  <data name="Error.DriveLetterInUse" xml:space="preserve"><value>That drive letter is already in use by another drive. Nothing was changed. Choose another letter.</value></data>
+  <data name="Error.DriveLetterInUse.Letter" xml:space="preserve"><value>Drive letter {0}: is already in use by another drive. Nothing was changed.</value></data>
+  <data name="Error.DriveLetterInUse.Still" xml:space="preserve"><value>The volume is still {0}:.</value></data>
+  <data name="Error.DriveLetterInUse.Action" xml:space="preserve"><value>Choose another letter.</value></data>
+  <data name="Error.CreatedButLetterFailed" xml:space="preserve"><value>The partition was created and formatted, but its drive letter is already in use by another drive. Use Change drive letter to give it a letter.</value></data>
+  <data name="Error.CreatedButLetterFailed.Letter" xml:space="preserve"><value>The partition was created and formatted, but drive letter {0}: is already in use by another drive.</value></data>
+  <data name="Error.CreatedButLetterFailed.Changed" xml:space="preserve"><value>Yes. The partition was created and formatted, without a drive letter.</value></data>
+  <data name="Error.CreatedButLetterFailed.Action" xml:space="preserve"><value>Use Change drive letter to give it a letter.</value></data>
   <data name="Error.DiskRemoved" xml:space="preserve"><value>The disk was disconnected during the operation. It may have been partly changed. Connect it again to see its current state.</value></data>
   <data name="Error.DiskRemovedDuringFormat" xml:space="preserve"><value>The disk was disconnected during the format. The volume may be incomplete. Connect the disk again and format it again.</value></data>
   <data name="Error.Unknown" xml:space="preserve"><value>Something went wrong and Windows didn't say why. The disk may have been partly changed. Refresh to see its current state.</value></data>
@@ -104,6 +112,9 @@
   <data name="Ui.Chip.NotInitialized" xml:space="preserve"><value>Not initialized</value></data>
   <data name="Ui.Chip.ReadOnly" xml:space="preserve"><value>Read-only</value></data>
   <data name="Ui.Chip.Managed" xml:space="preserve"><value>Managed by Windows</value></data>
+  <data name="Ui.Chip.NoMedia" xml:space="preserve"><value>No media</value></data>
+  <data name="Ui.NoMedia.Title" xml:space="preserve"><value>No media.</value></data>
+  <data name="Ui.NoMedia.Body" xml:space="preserve"><value>Insert a card or disk to use this drive.</value></data>
   <data name="Ui.Chip.Online" xml:space="preserve"><value>Online</value></data>
   <data name="Ui.Chip.Busy" xml:space="preserve"><value>Busy</value></data>
   <data name="Ui.Chip.Encrypted" xml:space="preserve"><value>Encrypted</value></data>
@@ -199,6 +210,7 @@
   <data name="Ui.Group.Size" xml:space="preserve"><value>Size</value></data>
   <data name="Ui.Group.NameAndLetter" xml:space="preserve"><value>Name and drive letter</value></data>
   <data name="Ui.ListAnd" xml:space="preserve"><value>{0} and {1}</value></data>
+  <data name="Ui.Toast.NoMedia" xml:space="preserve"><value>no media</value></data>
   <data name="Ui.Toast.Connected" xml:space="preserve"><value>{0} disk connected: {1} ({2})</value></data>
   <data name="Ui.Toast.Disconnected" xml:space="preserve"><value>Disk {0} was disconnected</value></data>
   <data name="Ui.Toast.SelectedDisconnected" xml:space="preserve"><value>Disk {0} was disconnected. Showing Disk {1} instead.</value></data>
@@ -353,13 +365,12 @@
   <data name="About.NeedsAdmin" xml:space="preserve"><value>Restart WinParted as administrator to change these settings.</value></data>
   <data name="About.On" xml:space="preserve"><value>On</value></data>
   <data name="About.Off" xml:space="preserve"><value>Off</value></data>
+  <data name="Reason.NoMedia" xml:space="preserve"><value>There's no card or disk in this drive. Insert one first.</value></data>
   <data name="Reason.DiskNotReadOnly" xml:space="preserve"><value>This disk isn't read-only.</value></data>
   <data name="Dlg.ClearReadOnly.Title" xml:space="preserve"><value>Turn off read-only for Disk {0}?</value></data>
   <data name="Dlg.ClearReadOnly.Body" xml:space="preserve"><value>Windows and programs will be able to change this disk and its volumes again. The read-only flag may have been set on purpose, by Windows or another tool. No data is changed.</value></data>
   <data name="Dlg.ClearReadOnly.Primary" xml:space="preserve"><value>Turn off read-only</value></data>
   <data name="Error.StillReadOnly" xml:space="preserve"><value>Disk {0} is still read-only. It's probably locked by its hardware or a Windows policy.</value></data>
   <data name="Error.StillReadOnly.Action" xml:space="preserve"><value>If it has a lock switch (like SD cards), slide it to unlocked and reconnect the disk.</value></data>
-  <data name="Ui.ShowDiskDetails" xml:space="preserve"><value>Show disk details</value></data>
-  <data name="Ui.ShowDiskDetailsName" xml:space="preserve"><value>{0}, show disk details</value></data>
   <data name="Ui.LayoutBar.Name" xml:space="preserve"><value>Partitions. Use the Left and Right arrow keys to move, Enter to go to actions, Escape to show the disk.</value></data>
 </root>

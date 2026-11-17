@@ -13,7 +13,8 @@ internal static class SnapshotReader
     {
         var disks = smp.Query("MSFT_Disk");
         var partitions = smp.Query("MSFT_Partition");
-        var volumesByPath = smp.Query("MSFT_Volume")
+        var volumes = smp.Query("MSFT_Volume");
+        var volumesByPath = volumes
             .Where(v => Smp.Str(v, "Path") is not null)
             .GroupBy(v => Smp.Str(v, "Path")!, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
@@ -29,8 +30,12 @@ internal static class SnapshotReader
             Disks = [.. disks.Select(d => MapDisk(d, partitionsByDiskPath, volumesByPath, facts))],
             Facts = new CoreFacts
             {
+                // Volume letters include volumes without a partition, such as an empty card reader
+                // slot, which holds a letter that no partition shows (change empty-card-reader-slots, D2).
                 UsedDriveLetters = [.. facts.OtherDriveLetters
-                    .Concat(partitions.Select(Smp.Letter).OfType<char>())],
+                    .Concat(partitions.Select(Smp.Letter).OfType<char>())
+                    .Concat(volumes.Select(Smp.Letter).OfType<char>())
+                    .Distinct()],
             },
         };
     }
@@ -57,6 +62,7 @@ internal static class SnapshotReader
             Bus = MapBus(Smp.U16(d, "BusType")),
             Style = Smp.U16(d, "PartitionStyle") switch { 1 => PartitionStyle.Mbr, 2 => PartitionStyle.Gpt, _ => PartitionStyle.Uninitialized },
             IsOffline = Smp.Bool(d, "IsOffline"),
+            HasNoMedia = MediaStatus.IsMissing(Smp.Prop(d, "OperationalStatus") as ushort[], Smp.U64(d, "Size")),
             OfflineReason = Smp.Bool(d, "IsOffline") ? OfflineReasonText(Smp.U16(d, "OfflineReason")) : null,
             Health = Smp.U16(d, "HealthStatus") switch { 0 => HealthStatus.Healthy, 1 => HealthStatus.Warning, 2 => HealthStatus.Unhealthy, _ => HealthStatus.Unknown },
             IsReadOnly = Smp.Bool(d, "IsReadOnly"),

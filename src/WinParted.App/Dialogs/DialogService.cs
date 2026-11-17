@@ -447,7 +447,7 @@ public sealed class DialogService(Func<XamlRoot> xamlRoot)
 
         var content = Panel(
             Facts((Texts.Get("Fail.WhatHappened"), Value(error.Message)),
-                  (Texts.Get("Fail.Changed"), Value(Texts.Get(error.MayHaveChanged ? "Fail.ChangedMaybe" : "Fail.ChangedNo"))),
+                  (Texts.Get("Fail.Changed"), Value(error.Changed ?? Texts.Get(error.MayHaveChanged ? "Fail.ChangedMaybe" : "Fail.ChangedNo"))),
                   (Texts.Get("Fail.WhatToDo"), Value(error.Advice ?? Texts.Get("Fail.WhatToDoText")))),
             expander);
 

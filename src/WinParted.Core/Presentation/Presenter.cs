@@ -30,6 +30,11 @@ public static class Presenter
 
     public static DiskView Disk(Disk disk, bool isBusy = false)
     {
+        if (disk.HasNoMedia)
+        {
+            return NoMediaDisk(disk, isBusy);
+        }
+
         var protection = ProtectionClassifier.Classify(disk);
         var chips = ImmutableArray.CreateBuilder<Chip>();
         if (protection.IsSystemDisk)
@@ -102,6 +107,35 @@ public static class Presenter
             Segments(disk),
             state,
             disk.OfflineReason,
+            automation);
+    }
+
+    /// <summary>
+    /// A drive without media, such as an empty card reader slot: no size, style, health or layout,
+    /// only its bus and "No media" (design D3).
+    /// </summary>
+    private static DiskView NoMediaDisk(Disk disk, bool isBusy)
+    {
+        var noMedia = new Chip(T("Ui.Chip.NoMedia"), ChipTone.Neutral, ChipIcon.Drive);
+        ImmutableArray<Chip> chips = isBusy ? [noMedia, new Chip(T("Ui.Chip.Busy"), ChipTone.Accent, ChipIcon.Busy)] : [noMedia];
+        ImmutableArray<Chip> header = [new Chip(Bus(disk.Bus), ChipTone.Neutral, BusIcon(disk.Bus)), .. chips];
+        var title = F("Ui.DiskTitle", disk.Number);
+        var automation = string.Join(", ", new[] { title, disk.FriendlyName, Bus(disk.Bus) }.Concat(chips.Select(c => c.Text)));
+
+        return new DiskView(
+            disk.Id,
+            title,
+            disk.FriendlyName,
+            SizeText: "",
+            Bus(disk.Bus),
+            StyleText: "",
+            Meta: $"{Bus(disk.Bus)} · {noMedia.Text}",
+            BusIcon(disk.Bus),
+            chips,
+            header,
+            Segments: [],
+            DiskState.NoMedia,
+            OfflineReason: null,
             automation);
     }
 
@@ -313,6 +347,11 @@ public static class Presenter
 
     private static DetailsView DiskDetails(Disk disk)
     {
+        if (disk.HasNoMedia)
+        {
+            return NoMediaDetails(disk);
+        }
+
         var protection = ProtectionClassifier.Classify(disk);
         var rows = ImmutableArray.CreateBuilder<DetailRow>();
         rows.Add(new(T("Ui.Detail.Size"), SizeFormatter.Format(disk.Size)));
@@ -343,6 +382,35 @@ public static class Presenter
             F("Ui.DiskTitle", disk.Number),
             protection.Role is { } r ? Texts.Role(r) : T("Ui.Role.Disk"),
             protection.IsProtected,
+            IsDisk: true,
+            HasUsage: false,
+            0,
+            "",
+            "",
+            Hint: null,
+            [],
+            rows.ToImmutable());
+    }
+
+    private static DetailsView NoMediaDetails(Disk disk)
+    {
+        var rows = ImmutableArray.CreateBuilder<DetailRow>();
+        rows.Add(new(T("Ui.Detail.BusType"), Bus(disk.Bus)));
+        rows.Add(new(T("Ui.Detail.Status"), T("Ui.Chip.NoMedia")));
+        if (!string.IsNullOrWhiteSpace(disk.SerialNumber))
+        {
+            rows.Add(new(T("Ui.Detail.SerialNumber"), disk.SerialNumber!, Copyable: true));
+        }
+
+        if (!string.IsNullOrWhiteSpace(disk.Location))
+        {
+            rows.Add(new(T("Ui.Detail.Location"), disk.Location!));
+        }
+
+        return new DetailsView(
+            F("Ui.DiskTitle", disk.Number),
+            Role: "", // There's no layout to select a partition in.
+            IsLocked: false,
             IsDisk: true,
             HasUsage: false,
             0,

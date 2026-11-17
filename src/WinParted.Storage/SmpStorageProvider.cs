@@ -132,8 +132,16 @@ public sealed class SmpStorageProvider : IStorageProvider, IDisposable
             }
         }
 
-        // Windows sometimes assigns a letter on its own (spike 2.1); enforce the requested one.
-        SetDriveLetter(id, r.Format is null ? null : r.DriveLetter);
+        // Windows sometimes assigns a letter on its own (spike 2.1); enforce the requested one. The
+        // partition exists by now, so any failure here means the disk did change.
+        try
+        {
+            SetDriveLetter(id, r.Format is null ? null : r.DriveLetter, afterCreate: true);
+        }
+        catch (StorageOperationException ex) when (!ex.Error.MayHaveChanged)
+        {
+            throw new StorageOperationException(ex.Error with { MayHaveChanged = true }, ex);
+        }
     }
 
     private void Format(CimInstance volume, FormatOptions options, IProgress<OperationProgress>? progress)
@@ -156,7 +164,14 @@ public sealed class SmpStorageProvider : IStorageProvider, IDisposable
         _smp.InvokeWithProgress(volume, "Format", progress, [.. args]);
     }
 
-    private void SetDriveLetter(PartitionId id, char? letter)
+    /// <summary>
+    /// Gives the partition <paramref name="letter"/> (or no letter). Checks first that no other drive
+    /// holds the letter, and puts the old letter back if Windows still refuses the new one, so a
+    /// failure leaves the volume as it was (change empty-card-reader-slots, D5).
+    /// </summary>
+    /// <param name="afterCreate">Called by Create partition: a letter in use is reported as
+    /// <see cref="StorageErrorKind.CreatedButLetterFailed"/>.</param>
+    private void SetDriveLetter(PartitionId id, char? letter, bool afterCreate = false)
     {
         var partition = FindPartition(id);
         var current = Smp.Letter(partition);
@@ -165,25 +180,92 @@ public sealed class SmpStorageProvider : IStorageProvider, IDisposable
             return;
         }
 
+        if (letter is char taken && IsHeldByAnotherDrive(taken, partition))
+        {
+            if (afterCreate && current is char auto)
+            {
+                // A new partition is left without a letter rather than with one Windows picked.
+                _smp.Invoke(partition, "RemoveAccessPath", ("AccessPath", $"{auto}:\\", CimType.String));
+            }
+
+            throw LetterInUse(taken, current, code: null, $"{taken}: is already held by another drive (checked before changing anything)", afterCreate);
+        }
+
         if (current is char old)
         {
             _smp.Invoke(partition, "RemoveAccessPath", ("AccessPath", $"{old}:\\", CimType.String));
         }
 
-        if (letter is char wanted)
+        if (letter is not char wanted)
         {
-            try
+            return;
+        }
+
+        try
+        {
+            _smp.Invoke(FindPartition(id), "AddAccessPath", ("AccessPath", $"{wanted}:\\", CimType.String));
+        }
+        catch (StorageOperationException ex)
+        {
+            // Windows may have mounted the volume at that letter on its own in the meantime.
+            if (Smp.Letter(FindPartition(id)) == wanted)
             {
-                _smp.Invoke(FindPartition(id), "AddAccessPath", ("AccessPath", $"{wanted}:\\", CimType.String));
+                return;
             }
-            catch (StorageOperationException ex) when (current is not null)
+
+            // After Create partition, a letter Windows picked on its own isn't put back.
+            var restored = afterCreate || current is not char previous || TryAddAccessPath(id, previous);
+            if (!restored)
             {
-                // The old letter is already gone, so something did change.
-                throw new StorageOperationException(ex.Error with { MayHaveChanged = true }, ex);
+                // The old letter is gone and couldn't be put back, so something did change.
+                throw new StorageOperationException(
+                    StorageErrorMapper.Create(StorageErrorKind.Unknown, ex.Error.Code, $"AddAccessPath {wanted}: failed and {current}: couldn't be restored", ex.Error.Details),
+                    ex);
             }
+
+            if (ex.Error.Code == 42002)
+            {
+                throw LetterInUse(wanted, current, 42002, ex.Error.Details ?? "AddAccessPath returned 42002", afterCreate);
+            }
+
+            throw;
         }
     }
 
+    private static StorageOperationException LetterInUse(char letter, char? current, uint? code, string details, bool afterCreate) =>
+        new(afterCreate
+            ? StorageErrorMapper.CreatedButLetterFailed(letter, code, details)
+            : StorageErrorMapper.DriveLetterInUse(letter, current, code, details));
+
+    private bool TryAddAccessPath(PartitionId id, char letter)
+    {
+        try
+        {
+            _smp.Invoke(FindPartition(id), "AddAccessPath", ("AccessPath", $"{letter}:\\", CimType.String));
+            return true;
+        }
+        catch (StorageOperationException)
+        {
+            return Smp.Letter(FindPartition(id)) == letter;
+        }
+    }
+
+    /// <summary>
+    /// Whether a drive other than this partition's volume holds <paramref name="letter"/>: any SMP
+    /// volume (including one without a partition, like an empty card reader slot) or any other drive
+    /// Windows lists (network drives, subst).
+    /// </summary>
+    private bool IsHeldByAnotherDrive(char letter, CimInstance partition)
+    {
+        var ownPaths = (Smp.Prop(partition, "AccessPaths") as string[] ?? []).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        if (_smp.Query("MSFT_Volume").Any(v => Smp.Letter(v) == letter && !(Smp.Str(v, "Path") is { } p && ownPaths.Contains(p))))
+        {
+            return true;
+        }
+
+        return Smp.Letter(partition) != letter
+            && DriveInfo.GetDrives().Any(d => char.ToUpperInvariant(d.Name[0]) == letter);
+    }
     private CimInstance FindDisk(DiskId id) =>
         _smp.Query("MSFT_Disk").FirstOrDefault(d => Smp.Str(d, "ObjectId") == id.Value) ?? throw TargetGone();
 

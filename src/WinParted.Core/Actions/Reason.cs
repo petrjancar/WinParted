@@ -11,6 +11,7 @@ public enum ReasonCode
 {
     // Global
     OperationInProgress,
+    NoMedia,
     TargetChanged,
     DiskReadOnly,
     DynamicDisk,

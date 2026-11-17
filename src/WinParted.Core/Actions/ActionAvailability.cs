@@ -87,6 +87,13 @@ public static class ActionAvailability
     /// <summary>Turn off read-only only on a read-only disk, listed first because it unblocks the others.</summary>
     private static ImmutableArray<ActionKind> DiskActions(Disk? disk)
     {
+        // A drive without media lists only what the user might expect (both disabled). The offline
+        // and read-only flags Windows reports for it are side effects of having no media.
+        if (disk?.HasNoMedia == true)
+        {
+            return [ActionKind.Initialize, ActionKind.ClearDisk];
+        }
+
         ImmutableArray<ActionKind> common =
         [
             ActionKind.Initialize,
@@ -191,6 +198,11 @@ public static class ActionAvailability
 
     private static Reason? CheckDisk(ActionKind kind, Disk disk)
     {
+        if (disk.HasNoMedia)
+        {
+            return Reason.Of(ReasonCode.NoMedia);
+        }
+
         var protection = ProtectionClassifier.Classify(disk);
 
         // Bring online writes no data, and Turn off read-only changes only the attribute, so a

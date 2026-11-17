@@ -89,3 +89,25 @@ Consequences:
 - Consequences: Turn off read-only is available on offline disks too, and the result must come from re-reading the disk, never from the return code (design D2). The read-only attach is the case that proves it.
 
 `readonly-card` (task 1.2): with an SD card whose lock switch was on, Windows reported **no** read-only removable disk, so the card wasn't read-only to Windows at all (many card readers don't pass the switch on, or the switch is broken). Not tested on real locked hardware; the read-only attach above covers the same "still read-only" path.
+
+## Drive without media (empty-card-reader-slots, 2026-11-17)
+
+Two-slot USB card reader, card only in the microSD slot. Read-only queries (`Get-Disk`, `Get-Volume`, `Get-Partition`, `MSFT_Disk`, `DriveInfo`):
+
+| | Empty SD slot | microSD card |
+|---|---|---|
+| `MSFT_Disk` | `Size` 0, `PartitionStyle` 0 (RAW), `IsOffline` true, `OfflineReason` 0, `HealthStatus` 0 (Healthy), `LogicalSectorSize` 0, `OperationalStatus` {53266 = 0xD012 "No Media"} | 62 GB, MBR, online |
+| `MSFT_PhysicalDisk` | not listed | listed |
+| `MSFT_Partition` | none | partition 1, E: |
+| `MSFT_Volume` | `DriveLetter` D, `Size` 0, file system Unknown, no partition | E:, FAT32 |
+| `DriveInfo` | D:, Removable, not ready | E:, Removable, ready |
+
+- The empty slot **holds a drive letter** through a volume that has no partition. `MSFT_Volume` has no disk reference, so the letter can't be linked to the slot.
+- Return code **42002** from `CreatePartition` / `AddAccessPath`: "The requested access path is already in use." WinParted offered D: because it counted only partition letters and non-removable `DriveInfo` letters as used.
+- Consequences: count every `MSFT_Volume.DriveLetter` as used, and treat `OperationalStatus` 0xD012 (or size 0) as "No media".
+
+Card insert and removal (task 6.1, a read-only script subscribed to the five events below and polling `MSFT_Disk`, elevated, card inserted and removed five times):
+
+- **No event fired**: not `MSFT_StorageArrivalEvent`, `MSFT_StorageDepartureEvent`, `MSFT_StorageModificationEvent`, `Win32_VolumeChangeEvent` or `Win32_DeviceChangeEvent`. The slot's volume exists with or without a card, so no volume arrives.
+- `MSFT_Disk` of the slot changed within about a second each time: size 0 → 1 GB, `OperationalStatus` 53266 (No Media) → 53264 (OK), `IsOffline` true → false, and back on removal.
+- Consequence: WinParted checks those values for removable drives and empty slots every 2 seconds (design D8 of the change).

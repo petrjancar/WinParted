@@ -77,6 +77,8 @@ One entry per disk, showing:
 - A small **overview of the layout** (a mini partition bar) is recommended so users can tell disks apart at a glance.
 - **Status indicators** (icon + text, see section 4): System disk, Offline, Read-only, Health warning, Managed by Windows (dynamic / Storage Spaces), Busy (operation running).
 
+A **drive without media** (such as an empty card reader slot) shows no size and no layout overview: its line reads "USB · No media" and it carries a neutral **No media** indicator (section 4.2).
+
 Disks are ordered by disk number.
 
 ### 3.3 Selected disk header
@@ -107,7 +109,7 @@ The visual centerpiece. A horizontal bar for the selected disk:
 
 Shows properties of the selected item.
 
-**Back to the disk** (added after the MVP): with a partition or unallocated region selected, a breadcrumb line sits above the title: "Disk 1 › Data (D:)", where "Disk 1" is a link back to the disk's details and actions. The same happens when the user clicks the disk in the disk list (also the selected one) or the disk's name in the header (clickable only while a segment is selected; looks like the heading, with a hover highlight, tooltip "Show disk details", announced as "Disk 1, show disk details"), or presses Escape anywhere in the window (not while a dialog is open or in a text field). The layout's screen-reader hint: "Partitions. Use the Left and Right arrow keys to move, Enter to go to actions, Escape to show the disk."
+**Back to the disk** (added after the MVP): with a partition or unallocated region selected, a breadcrumb line sits above the title: "Disk 1 › Data (D:)", where "Disk 1" is a link back to the disk's details and actions. The same happens when the user clicks the disk in the disk list (also the selected one) or presses Escape anywhere in the window (not while a dialog is open or in a text field). The disk's name in the header is plain text, not a link (an earlier clickable version was removed as confusing). The layout's screen-reader hint: "Partitions. Use the Left and Right arrow keys to move, Enter to go to actions, Escape to show the disk."
 
 **Partition:**
 - Title (as on the segment) and plain-language role description (e.g. "Windows needs this to start").
@@ -162,6 +164,7 @@ A **Refresh** button (and F5) reloads all information. Selection is kept if the 
 | **Health warning / unhealthy** | Warning badge + Windows' health text. Actions still allowed (subject to other rules), but the user should notice. |
 | **Managed by Windows** (dynamic disk, Storage Spaces) | Lock badge + "Managed by Storage Spaces" / "Dynamic disk - managed by Disk Management". Everything read-only. |
 | **Busy** | Operation running on this disk; progress shown (section 8). |
+| **No media** (added after the MVP) | A drive with nothing in it, typically an empty slot of a card reader. Windows reports it as an offline 0-byte disk, but WinParted shows it as what it is. Disk list: "USB · No media", no size, no layout overview, a neutral **No media** badge. Header: only the bus and **No media** chips. Layout replaced with a card: "No media." + "Insert a card or disk to use this drive." (no button). Details: bus type, status "No media", serial number, location. Actions: Initialize and Clear disk are disabled with the no-media reason (section 7.1); Bring online, Take offline and Turn off read-only aren't listed. Inserting a card shows it within about 3 seconds under the same disk number, with no "connected" notification; removing it returns to No media. The letter Windows keeps for an empty slot is never offered in drive letter lists (sections 6.4, 6.9). |
 
 ### 4.3 Segment states
 
@@ -263,7 +266,7 @@ All modifying operations use a dialog (ContentDialog or similar). Common rules:
   - **Format**: on by default; option **Don't format** (creates an empty partition with no file system and no drive letter).
   - **File system**: NTFS (default), exFAT, FAT32. Unavailable options are disabled with the reason (section 7.3). ReFS is not offered for formatting in the MVP (existing ReFS volumes are still shown and can be resized).
   - **Volume label**: empty by default; validated per file system (section 7.3).
-  - **Drive letter**: first free letter by default; dropdown of free letters plus "No drive letter".
+  - **Drive letter**: first free letter by default; dropdown of free letters plus "No drive letter". A letter is free only if no drive holds it, including an empty card reader slot (which holds a letter without a partition). If the letter is taken by another drive before Create runs, the partition is still created and formatted, without a letter (section 8.1).
   - **Quick format**: on by default.
 - When "Don't format" is selected, the file system, label, letter and quick format fields are disabled.
 - MBR limit: if no more partitions fit, Create partition is disabled before the dialog (section 7).
@@ -308,7 +311,8 @@ All modifying operations use a dialog (ContentDialog or similar). Common rules:
 
 ### 6.9 Change drive letter
 
-- Dropdown of free letters + "No drive letter".
+- Dropdown of free letters + "No drive letter". Letters held by any drive, including an empty card reader slot, aren't listed.
+- If the new letter is taken by another drive before the change runs, nothing is changed and the volume keeps its letter (section 8.1).
 - When removing a letter: "Programs and shortcuts that use E: may stop working. The files on the volume are not affected."
 - When changing: "Programs and shortcuts that use E: may need to be updated."
 - Primary: **Change** / **Remove letter**.
@@ -350,6 +354,7 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 | Dynamic disk | "This is a dynamic disk. WinParted can't change dynamic disks. Use Disk Management." |
 | Storage Spaces | "Managed by Storage Spaces. Use Storage Spaces in Settings to change it." |
 | Disk offline | "This disk is offline. Bring it online first." |
+| No media (empty card reader slot; checked before every other disk rule) | "There's no card or disk in this drive. Insert one first." |
 
 ### 7.2 Protected items
 
@@ -409,6 +414,8 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 | Target changed before running | "This disk was disconnected or changed. Nothing was modified." |
 | Disk removed during operation | "Disk 3 was disconnected while formatting. The volume may be incomplete. Format it again before using it." |
 | Partition created, format failed | "The partition was created, but formatting failed. It's shown as Unformatted. You can try formatting it again." |
+| Change drive letter: the new letter was taken in the meantime | "Drive letter X: is already in use by another drive. Nothing was changed. The volume is still E:." What you can do: "Choose another letter." |
+| Create partition: the chosen letter was taken in the meantime | "The partition was created and formatted, but drive letter F: is already in use by another drive." Was anything changed: "Yes. The partition was created and formatted, without a drive letter." What you can do: "Use Change drive letter to give it a letter." |
 | Unknown error | "Something went wrong and Windows didn't say why. Check Technical details. The disk may have been partly changed. Refresh to see its current state." |
 
 ---
@@ -417,6 +424,8 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 
 - Disks appearing or disappearing update the list automatically within about 3 seconds.
 - Non-blocking notification: "USB disk connected: SanDisk Ultra (57.3 GB)" / "Disk 3 was disconnected".
+- Each disk is announced once. A drive without media is announced without a size: "USB disk connected: Generic MassStorageClass (no media)".
+- A card inserted into or removed from a connected reader updates that slot within about 3 seconds, with no notification. Windows sends no event for this, so WinParted checks removable drives and empty slots every 2 seconds, except while the window is minimized or an operation is running.
 - If the **selected** disk disappears: the first remaining disk is selected (the main area is never left empty) and the notification explains: "Disk 3 was disconnected. Showing Disk 0 instead."
 - If a **dialog's** disk disappears or changes: the dialog closes (section 6, common rules).
 - Changes to **other** disks never disturb an open dialog or a running operation.
@@ -456,6 +465,8 @@ Wording can be polished, but each reason must name the **specific obstacle** and
 **Disk 4**: Msft Virtual Disk, 64 GB, Virtual, GPT, **Offline** (reason: Policy) and **Read-only**
 
 **Disk 6** (added with Turn off read-only): Lexar SDXC Card, 59.4 GB, SD, MBR, **Read-only**, one volume PHOTOS (H:), exFAT, 23.8 GB used
+
+**Disk 7** (added with empty card reader slots): Generic STORAGE DEVICE, USB, **No media** (an empty card reader slot). It holds I:, so I: is never offered as a free letter.
 
 ---
 

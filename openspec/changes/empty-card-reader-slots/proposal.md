@@ -21,8 +21,10 @@ Both affect anyone with a multi-slot card reader, which is a common setup.
   - in place of the layout and offline panel, "No media. Insert a card or disk to use this drive.";
   - only the details that mean something (bus type, status "No media", serial number, location);
   - every disk action unavailable with the reason "There's no card or disk in this drive. Insert one first."
-- **Inserting a card** into a slot that's shown as No media updates the disk within the usual 3 seconds. Removing it returns the slot to No media.
+- **Inserting a card** into a slot that's shown as No media updates the disk within the usual 3 seconds. Removing it returns the slot to No media. Windows sends no event for this (found in the end-to-end check), so WinParted checks removable drives and empty slots every 2 seconds while one is connected, the window isn't minimized and no operation is running.
+- **Each connected disk is announced once** (found in the end-to-end check, where plugging in the reader showed every notification twice), and an empty slot is announced with "no media" instead of "0 bytes".
 - **Sample data** gains an empty card reader slot that holds a drive letter, so the state can be designed and checked in sample mode.
+- **The disk name in the header is no longer a link** (the clickable "Disk 1" back to the disk view, added in 1.0.0, was confusing). The way back stays: the disk in the list, the "Disk 1 ›" link in the details panel, and Escape. Escape no longer shows the key's name as a tooltip in the Windows language (e.g. "Zruš" on Czech Windows).
 - Ships as version **1.0.1**.
 
 ## Capabilities
@@ -33,8 +35,9 @@ None.
 
 ### Modified Capabilities
 
-- `disk-inventory`: new requirement "Drive without media" (how an empty slot is listed, its details and that it updates when a card is inserted or removed).
+- `disk-inventory`: new requirement "Drive without media" (how an empty slot is listed, its details and that it updates when a card is inserted or removed); "Back to the disk view" drops the clickable disk name in the header.
 - `operation-execution`: "Unavailable actions explain why" gains the no-media reason; "Operation results" gains the drive-letter-in-use outcome.
+- `device-change-detection`: "Automatic refresh on device change" covers media inserted into or removed from a connected drive, and when WinParted checks for it; "Burst coalescing" announces each connected disk once.
 - `partition-operations`: "Change drive letter" and "Format options on create" define a free letter as one no volume holds, including empty card reader slots, and say what happens when the letter is taken anyway.
 
 ## Impact

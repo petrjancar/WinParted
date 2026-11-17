@@ -38,6 +38,8 @@ public sealed class DiskBuilder
 
     public bool IsReadOnly { get; set; }
 
+    public bool HasNoMedia { get; set; }
+
     public bool IsRemovableMedia { get; set; }
 
     public bool? IsStorageSpacesMember { get; set; } = false;
@@ -109,6 +111,7 @@ public sealed class DiskBuilder
         IsBoot = IsBoot,
         IsOffline = IsOffline,
         IsReadOnly = IsReadOnly,
+        HasNoMedia = HasNoMedia,
         IsRemovableMedia = IsRemovableMedia,
         IsStorageSpacesMember = IsStorageSpacesMember,
         Health = Health,

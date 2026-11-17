@@ -89,14 +89,26 @@ Step 1 makes the race rare. Step 3 handles the rest without leaving a volume wit
 - Sample mode gains Disk 7: "Generic STORAGE DEVICE", USB, no media, holding I: (added to the sample's used letters).
 - I: then isn't offered in sample dialogs, which lets the dialog side of D2 be checked without hardware.
 
-### D8. Card insert and removal reuse the existing change events
+### D8. Card insert and removal are found by checking, not by events
 
-- `SmpDeviceChangeSource` already listens to `Win32_VolumeChangeEvent`. Inserting media should raise a volume arrival for the slot.
-- **To be verified** with the real reader (tasks). If no event arrives, add a subscription to `MSFT_StorageModificationEvent` for disks.
+**Finding (task 6.1, `docs/spikes/smp-behavior.md`):** inserting or removing a card in a connected reader raises **no** event: not `MSFT_StorageArrivalEvent`, `MSFT_StorageDepartureEvent`, `MSFT_StorageModificationEvent`, `Win32_VolumeChangeEvent` or `Win32_DeviceChangeEvent`. The slot's volume (D:) exists with or without a card, so no volume arrives. Only `MSFT_Disk` changes: size, `OperationalStatus` and `IsOffline`, within about a second.
 
+**Decision:** a `MediaPoller` (Core, `IDeviceChangeSource`) checks size, offline and no media every 2 seconds and raises `Changed` when they differ from the last applied snapshot. The existing debouncer then triggers one refresh, whose snapshot becomes the new baseline. Comparing against the snapshot (not the previous check) means a change right after a refresh is never missed, and an operation's own changes don't cause an extra refresh.
+- **What is checked:** only the disks to watch, by number: disks without media and removable media disks (`Disk.HasNoMedia || Disk.IsRemovableMedia`), taken from each applied snapshot. A disk watched once stays watched while it's connected: in the end-to-end check, the refresh right after a card was inserted sometimes ran before Windows listed the card as removable, so the slot dropped out of the watch list and the card's removal went unnoticed. External hard drives usually report as fixed and aren't touched, so a sleeping drive isn't woken. With nothing to watch, nothing runs.
+- **When it's paused:** while the window is minimized and while an operation is running. A change made meanwhile is found at the first check after the pause.
+- **One check at a time:** a check that is still running (a slow or stuck device) makes the next ones skip. A failed check is ignored.
+- **Storage side:** `SmpDeviceChangeSource` reads `Size`, `IsOffline` and `OperationalStatus` of the watched disk numbers with one WQL query (`WHERE Number = 1 OR Number = 2`).
+- **Rejected:** listening for window messages (`WM_DEVICECHANGE` with the media flag). It needs hooks into the WinUI window, and `Win32_VolumeChangeEvent`, which is built on those messages, stayed silent here. Checking all disks: unnecessary, and could wake sleeping external drives.
+
+### D9. Each connected disk is announced once
+
+- **Finding (task 6.1):** plugging in the reader showed each "connected" notification twice. Two refreshes overlapped: a second device event arrived while the first refresh was still reading, and both compared against the same old snapshot.
+- **Decision:** refreshes run one at a time (`MainViewModel`), so the second compares against the result of the first.
+- A drive without media is announced as "USB disk connected: Generic MassStorageClass (no media)" instead of "(0 bytes)".
 ## Risks / Trade-offs
 
 - **Other readers may report media absence differently.** The size-0 fallback covers "Not Ready" and similar. A reader that reports a non-zero size without media would still look like an offline disk, as today.
 - **Volume letters from SMP could include a letter just freed.** It's the same source WinParted already trusts for partitions, so nothing gets worse. At worst a letter is skipped until the next refresh.
 - **The check before removing (D5) costs one extra read** per Change drive letter. That's negligible.
+- **Checking for media (D8) costs one small query every 2 seconds** while a removable drive or empty slot is connected. A card change shows within about 1 to 3 seconds instead of under one. Whether the query can wake a sleeping drive isn't tested; it's limited to removable media, which has nothing to spin up.
 - **Restoring the old letter can itself fail** (another program took it). WinParted then reports "may have changed", which is the honest state.

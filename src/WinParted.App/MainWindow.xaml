@@ -11,7 +11,9 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid RowDefinitions="Auto,*">
+    <!-- KeyboardAcceleratorPlacementMode="Hidden": otherwise WinUI shows the Esc key's name as a tooltip
+         wherever the pointer rests, in the Windows language (e.g. "Zruš" on Czech Windows). -->
+    <Grid RowDefinitions="Auto,*" KeyboardAcceleratorPlacementMode="Hidden">
         <!-- Escape anywhere shows the disk view again (spec disk-inventory "Back to the disk view"). -->
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Key="Escape" Invoked="OnEscapeInvoked" />
@@ -154,17 +156,10 @@
                 <ScrollViewer Visibility="{x:Bind app:Ui.Show(Vm.ShowContent), Mode=OneWay}">
                     <StackPanel Padding="28,24,28,24" Spacing="20" MaxWidth="1200">
                         <!-- Header: rows, no action buttons (disk actions are in the actions card of the disk view).
-                             With a segment selected, the disk name is a button back to the disk view. -->
+                             The disk name is plain text; the way back to the disk view is the breadcrumb in the details panel. -->
                         <StackPanel Spacing="10">
                             <StackPanel Orientation="Horizontal" Spacing="12">
-                                <TextBlock Text="{x:Bind Vm.SelectedDisk.Title, Mode=OneWay, FallbackValue=''}" Style="{StaticResource TitleTextBlockStyle}"
-                                           Visibility="{x:Bind app:Ui.Hide(Vm.HasSegmentSelected), Mode=OneWay}" />
-                                <Button Click="OnShowDiskClick" Background="Transparent" BorderThickness="0" Padding="6,0" Margin="-6,0,0,0"
-                                        Visibility="{x:Bind app:Ui.Show(Vm.HasSegmentSelected), Mode=OneWay}"
-                                        ToolTipService.ToolTip="{x:Bind app:Ui.Text('Ui.ShowDiskDetails')}"
-                                        AutomationProperties.Name="{x:Bind Vm.ShowDiskName, Mode=OneWay}">
-                                    <TextBlock Text="{x:Bind Vm.SelectedDisk.Title, Mode=OneWay, FallbackValue=''}" Style="{StaticResource TitleTextBlockStyle}" />
-                                </Button>
+                                <TextBlock Text="{x:Bind Vm.SelectedDisk.Title, Mode=OneWay, FallbackValue=''}" Style="{StaticResource TitleTextBlockStyle}" />
                                 <TextBlock Text="{x:Bind Vm.SelectedDisk.Name, Mode=OneWay, FallbackValue=''}" VerticalAlignment="Bottom" Margin="0,0,0,4"
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>
@@ -213,6 +208,15 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- No media (empty card reader slot): no button, nothing to act on -->
+                        <Border Style="{StaticResource CardBorderStyle}" Padding="28" Visibility="{x:Bind app:Ui.Show(Vm.IsNoMediaDisk), Mode=OneWay}">
+                            <StackPanel HorizontalAlignment="Center" Spacing="10">
+                                <FontIcon Glyph="&#xE7F1;" FontSize="36" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind app:Ui.Text('Ui.NoMedia.Title')}" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                                <TextBlock Text="{x:Bind app:Ui.Text('Ui.NoMedia.Body')}" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </Border>
+
                         <!-- Partition layout -->
                         <StackPanel Spacing="10" Visibility="{x:Bind app:Ui.Show(Vm.IsNormalDisk), Mode=OneWay}">
                             <Grid ColumnDefinitions="*,Auto">
@@ -244,7 +248,8 @@
                                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                             <TextBlock Text="{x:Bind Vm.Details.Title, Mode=OneWay, FallbackValue=''}" Style="{StaticResource SubtitleTextBlockStyle}" />
-                                            <TextBlock Text="{x:Bind Vm.Details.Role, Mode=OneWay, FallbackValue=''}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Text="{x:Bind Vm.Details.Role, Mode=OneWay, FallbackValue=''}" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                       Visibility="{x:Bind app:Ui.ShowIf(Vm.Details.Role), Mode=OneWay}" />
                                         </StackPanel>
                                         <Border Grid.Column="1" VerticalAlignment="Top" CornerRadius="12" Padding="8,2" Background="{ThemeResource SubtleFillColorSecondaryBrush}"
                                                 Visibility="{x:Bind app:Ui.Show(Vm.DetailsLocked), Mode=OneWay}">
