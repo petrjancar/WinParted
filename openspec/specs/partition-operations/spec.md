@@ -26,11 +26,15 @@ The system SHALL let the user create a partition in a selected unallocated regio
 - **THEN** Create partition is disabled with the reason that MBR disks are limited to four primary partitions
 
 ### Requirement: Format options on create
-The Create partition dialog SHALL offer formatting with file system, volume label, drive letter and quick format, defaulting to NTFS, no label, the first free drive letter and quick format on, and SHALL offer leaving the partition unformatted.
+The Create partition dialog SHALL offer formatting with file system, volume label, drive letter and quick format, defaulting to NTFS, no label, the first free drive letter and quick format on, and SHALL offer leaving the partition unformatted. A drive letter is free only if no drive holds it, including volumes without a partition such as an empty card reader slot.
 
 #### Scenario: Create without formatting
 - **WHEN** the user chooses "Don't format" and confirms
 - **THEN** a partition is created without a file system and without a drive letter, even if Windows assigned one on its own during creation
+
+#### Scenario: Letter of an empty card reader slot
+- **WHEN** C: is the Windows volume and an empty card reader slot holds D:
+- **THEN** the dialog offers E: as the default letter and doesn't offer D:
 
 ### Requirement: Supported file systems
 The system SHALL offer NTFS, exFAT and FAT32 for formatting, with FAT32 only for volumes of 32 GB or less, matching what Windows itself offers; an unavailable choice SHALL be shown disabled with a reason. ReFS SHALL NOT be offered for formatting in the MVP; existing ReFS volumes remain shown and resizable.
@@ -100,7 +104,7 @@ The system SHALL let the user extend an NTFS or ReFS volume into unallocated spa
 - **THEN** Extend is disabled with the reason that a volume can only grow into free space after it, and that moving partitions is not supported
 
 ### Requirement: Change drive letter
-The system SHALL let the user assign, change or remove a volume's drive letter, offering only letters that are currently free.
+The system SHALL let the user assign, change or remove a volume's drive letter, offering only letters that are currently free (held by no drive, including volumes without a partition such as an empty card reader slot), and SHALL leave the volume's current letter unchanged if the new letter turns out to be taken when the change runs.
 
 #### Scenario: Change letter
 - **WHEN** the user changes E: to X:
@@ -109,6 +113,14 @@ The system SHALL let the user assign, change or remove a volume's drive letter, 
 #### Scenario: Remove letter
 - **WHEN** the user removes the drive letter from E:
 - **THEN** the dialog warns that programs using E: may stop working, and after confirmation the volume has no drive letter
+
+#### Scenario: Letter of an empty card reader slot not offered
+- **WHEN** an empty card reader slot holds D: and the user opens Change drive letter for another volume
+- **THEN** D: is not in the list of letters
+
+#### Scenario: New letter taken in the meantime
+- **WHEN** the user changes E: to X:, and another drive takes X: before the change runs
+- **THEN** the user sees that X: is already in use by another drive and that nothing was changed, and the volume is still E:
 
 ### Requirement: Change volume label
 The system SHALL let the user change a volume's label, enforcing the file system's label length and character limits as the user types.
