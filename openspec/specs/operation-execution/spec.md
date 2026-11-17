@@ -24,6 +24,10 @@ Every disabled operation SHALL show a plain-language reason that names the speci
 - **WHEN** the user selects a FAT32 volume
 - **THEN** Shrink and Extend are disabled with the reason that only NTFS and ReFS volumes can be resized
 
+#### Scenario: Drive without media
+- **WHEN** the user selects a card reader slot with no card in it
+- **THEN** Initialize and Clear disk are shown disabled with the reason "There's no card or disk in this drive. Insert one first.", and Bring online and Take offline aren't offered
+
 ### Requirement: Confirmation before modification
 Every operation that modifies a disk SHALL require explicit confirmation in a dialog that states, in plain language, what will change and what data will be lost, naming the target by drive letter, label and disk number.
 
@@ -81,6 +85,14 @@ On success the system SHALL refresh the layout and show a brief success notifica
 #### Scenario: Disk removed mid-operation
 - **WHEN** the target disk is disconnected while a format is running
 - **THEN** the user sees that the disk was disconnected during the format and that the volume may be incomplete and should be formatted again
+
+#### Scenario: Drive letter taken during Create partition
+- **WHEN** the user creates and formats a partition with drive letter D:, and Windows refuses D: because another drive took it in the meantime
+- **THEN** the user sees that the partition was created and formatted but D: is already in use by another drive, that the disk was changed, and to use Change drive letter to give it a letter; the new partition is shown without a drive letter
+
+#### Scenario: Windows assigned the requested letter first
+- **WHEN** Windows reports the requested letter as in use, but it is in use by the partition the operation was giving it to
+- **THEN** the operation is reported as successful
 
 ### Requirement: Close during operation
 The system SHALL warn the user if they try to close the application while an operation is running and SHALL NOT abandon the operation silently.
