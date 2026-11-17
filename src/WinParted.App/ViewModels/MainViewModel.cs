@@ -50,6 +50,13 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
     private Selection _selection = Selection.None;
     private bool _hasLoaded;
 
+    /// <summary>
+    /// One refresh at a time. Overlapping refreshes (a device event during a manual refresh, or two
+    /// events a moment apart) would both compare against the same old snapshot and announce the
+    /// same connected disk twice.
+    /// </summary>
+    private readonly SemaphoreSlim _refreshGate = new(1, 1);
+
     public OperationRunner Runner { get; } = new(provider);
 
     public bool IsSampleMode { get; } = isSampleMode;
@@ -90,6 +97,9 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
     public bool IsNotInitialized => SelectedDisk?.State == DiskState.NotInitialized;
 
     public bool IsOfflineDisk => SelectedDisk?.State == DiskState.Offline;
+
+    /// <summary>A drive without media, such as an empty card reader slot (change empty-card-reader-slots, D4).</summary>
+    public bool IsNoMediaDisk => SelectedDisk?.State == DiskState.NoMedia;
 
     public StorageSnapshot Snapshot => _snapshot;
 
@@ -213,9 +223,6 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
     /// <summary>A partition or unallocated region is selected: the ways back to the disk view are shown (spec disk-inventory).</summary>
     public bool HasSegmentSelected => SelectedSegment is not null;
 
-    /// <summary>Accessible name of the header's disk-name button, e.g. "Disk 1, show disk details".</summary>
-    public string ShowDiskName => string.Format(System.Globalization.CultureInfo.CurrentCulture, Core.Text.Texts.Get("Ui.ShowDiskDetailsName"), SelectedDisk?.Title ?? "");
-
     public bool IsSelectedDiskReadOnly => SelectedDisk is { } d && _snapshot.FindDisk(d.Id)?.IsReadOnly == true;
 
     public bool DetailsLocked => Details?.IsLocked ?? false;
@@ -252,6 +259,19 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
     /// <summary>Reloads everything (design D3) and keeps the selection when its item still exists.</summary>
     [RelayCommand]
     public async Task RefreshAsync()
+    {
+        await _refreshGate.WaitAsync();
+        try
+        {
+            await RefreshCoreAsync();
+        }
+        finally
+        {
+            _refreshGate.Release();
+        }
+    }
+
+    private async Task RefreshCoreAsync()
     {
         var before = _snapshot;
         var selectedBefore = _selection.Disk;
@@ -421,8 +441,8 @@ public sealed partial class MainViewModel(IStorageProvider provider, bool isSamp
         OnPropertyChanged(nameof(IsNormalDisk));
         OnPropertyChanged(nameof(IsNotInitialized));
         OnPropertyChanged(nameof(IsOfflineDisk));
+        OnPropertyChanged(nameof(IsNoMediaDisk));
         OnPropertyChanged(nameof(IsSelectedDiskReadOnly));
-        OnPropertyChanged(nameof(ShowDiskName));
     }
 
     private async Task RemoveLaterAsync(Toast toast)

@@ -66,12 +66,16 @@ public sealed class SampleStorageProvider : IStorageProvider
             new Builder(6, PartitionStyle.Mbr, "Lexar SDXC Card", BusType.Sd) { ReadOnly = true, Removable = true, Location = "SD card reader" }
                 .Vol((ulong)(59.4 * GB) - MB, label: "PHOTOS", letter: 'H', fs: FileSystemKind.ExFat, used: (ulong)(23.8 * GB))
                 .Build(),
+
+            // An empty card reader slot: no media, but it holds I: through a volume without a partition.
+            new Builder(7, PartitionStyle.Uninitialized, "Generic STORAGE DEVICE", BusType.Usb) { NoMedia = true, Removable = true, Serial = "000000000820", Location = "USB card reader" }
+                .Build(totalSize: 0),
         };
 
         return new StorageSnapshot
         {
             Disks = [.. disks],
-            Facts = new SystemFacts { UsedDriveLetters = ['C', 'D', 'E', 'F', 'G', 'H'] },
+            Facts = new SystemFacts { UsedDriveLetters = ['C', 'D', 'E', 'F', 'G', 'H', 'I'] },
         };
     }
 
@@ -92,6 +96,8 @@ public sealed class SampleStorageProvider : IStorageProvider
         public bool Removable { get; init; }
 
         public bool ReadOnly { get; init; }
+
+        public bool NoMedia { get; init; }
 
         public Builder Part(ulong size, Guid gptType)
         {
@@ -167,7 +173,9 @@ public sealed class SampleStorageProvider : IStorageProvider
             Style = style,
             IsSystem = System,
             IsBoot = System,
-            IsOffline = Offline is not null,
+            IsOffline = Offline is not null || NoMedia,
+            HasNoMedia = NoMedia,
+            LogicalSectorSize = NoMedia ? 0u : 512u,
             IsReadOnly = ReadOnly,
             IsRemovableMedia = Removable,
             OfflineReason = Offline,

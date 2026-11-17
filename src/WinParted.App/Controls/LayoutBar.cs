@@ -325,6 +325,12 @@ public sealed class MiniBar : UserControl
             return;
         }
 
+        if (disk.State == DiskState.NoMedia)
+        {
+            // No size and no layout: nothing to draw (change empty-card-reader-slots, D3).
+            return;
+        }
+
         if (disk.State != DiskState.Normal || disk.Segments.IsEmpty)
         {
             _grid.ColumnDefinitions.Add(new ColumnDefinition());

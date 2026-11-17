@@ -55,6 +55,36 @@ public class StorageErrorMapperTests
         Assert.DoesNotContain("requested size", error.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Drive_letter_in_use_changed_nothing_and_names_both_letters()
+    {
+        var error = StorageErrorMapper.DriveLetterInUse('X', 'E', 42002, "AddAccessPath returned 42002");
+
+        Assert.False(error.MayHaveChanged);
+        Assert.Equal("Drive letter X: is already in use by another drive. Nothing was changed. The volume is still E:.", error.Message);
+        Assert.Equal("Choose another letter.", error.Advice);
+        Assert.Null(error.Changed);
+        Assert.False(StorageErrorMapper.Map(42002, "AddAccessPath").MayHaveChanged);
+    }
+
+    [Fact]
+    public void Drive_letter_in_use_without_a_current_letter()
+    {
+        var error = StorageErrorMapper.DriveLetterInUse('X', null, 42002, "AddAccessPath returned 42002");
+
+        Assert.Equal("Drive letter X: is already in use by another drive. Nothing was changed.", error.Message);
+    }
+
+    [Fact]
+    public void Created_but_letter_failed_says_the_disk_changed()
+    {
+        var error = StorageErrorMapper.CreatedButLetterFailed('D', 42002, "AddAccessPath after CreatePartition");
+
+        Assert.True(error.MayHaveChanged);
+        Assert.Equal("The partition was created and formatted, but drive letter D: is already in use by another drive.", error.Message);
+        Assert.Equal("Yes. The partition was created and formatted, without a drive letter.", error.Changed);
+        Assert.Equal("Use Change drive letter to give it a letter.", error.Advice);
+    }
     public static TheoryData<StorageErrorKind> AllKinds => [.. Enum.GetValues<StorageErrorKind>()];
 
     [Theory]

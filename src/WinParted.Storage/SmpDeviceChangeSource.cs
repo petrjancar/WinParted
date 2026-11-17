@@ -1,5 +1,8 @@
+using System.Collections.Immutable;
+using System.Globalization;
 using Microsoft.Management.Infrastructure;
 using WinParted.Core.Devices;
+using WinParted.Core.Model;
 using WinParted.Storage.Cim;
 
 namespace WinParted.Storage;
@@ -28,6 +31,27 @@ public sealed class SmpDeviceChangeSource : IDeviceChangeSource
         Subscribe(Smp.Cimv2, "SELECT * FROM Win32_VolumeChangeEvent", _ => true);
     }
 
+    /// <summary>
+    /// The values a media check compares (change empty-card-reader-slots, D8), for the given disk
+    /// numbers only, so other disks (such as a sleeping external drive) aren't touched.
+    /// </summary>
+    public IReadOnlyList<DiskMediaState> ReadMediaStates(ImmutableArray<int> numbers)
+    {
+        if (numbers.IsEmpty)
+        {
+            return [];
+        }
+
+        var where = string.Join(" OR ", numbers.Select(n => string.Create(CultureInfo.InvariantCulture, $"Number = {n}")));
+        var query = $"SELECT Number, Size, IsOffline, OperationalStatus FROM MSFT_Disk WHERE {where}";
+        return [.. _session.QueryInstances(Smp.StorageNamespace, "WQL", query)
+            .Select(d => new DiskMediaState(
+                Smp.Prop(d, "Number") is { } n ? Convert.ToInt32(n, CultureInfo.InvariantCulture) : -1,
+                Smp.U64(d, "Size"),
+                Smp.Bool(d, "IsOffline"),
+                MediaStatus.IsMissing(Smp.Prop(d, "OperationalStatus") as ushort[], Smp.U64(d, "Size"))))
+            .OrderBy(s => s.Number)];
+    }
     public void Dispose()
     {
         foreach (var s in _subscriptions)

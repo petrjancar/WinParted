@@ -70,6 +70,7 @@ public enum DiskState
     Normal,
     NotInitialized,
     Offline,
+    NoMedia,
 }
 
 /// <summary>One segment of the layout bar (partition or unallocated region).</summary>

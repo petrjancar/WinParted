@@ -12,6 +12,7 @@ public partial class App : Application
     private Window? _window;
     private IDeviceChangeSource? _deviceChanges;
     private ChangeDebouncer? _debouncer;
+    private MediaPoller? _mediaPoller;
 
     /// <summary>
     /// Held while the app runs, so the installer and uninstaller can ask the user to close WinParted
@@ -149,10 +150,32 @@ public partial class App : Application
             _debouncer.Attach(source);
             source.Start();
             _deviceChanges = source;
+
+            // Card inserted into or removed from a connected reader: Windows sends no event, so the
+            // removable drives and empty slots are checked (change empty-card-reader-slots, D8).
+            var poller = new MediaPoller(source.ReadMediaStates);
+            _debouncer.Attach(poller);
+            poller.Watch(viewModel.Snapshot);
+            viewModel.SnapshotApplied += (_, snapshot) => poller.Watch(snapshot);
+            void UpdatePause() => poller.IsPaused =
+                window.AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter { State: Microsoft.UI.Windowing.OverlappedPresenterState.Minimized }
+                || viewModel.IsBusy;
+            window.AppWindow.Changed += (_, _) => UpdatePause();
+            window.VisibilityChanged += (_, _) => UpdatePause();
+            viewModel.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(viewModel.IsBusy))
+                {
+                    UpdatePause();
+                }
+            };
+            poller.Start();
+            _mediaPoller = poller;
         }
 
         window.Closed += (_, _) =>
         {
+            _mediaPoller?.Dispose();
             _deviceChanges?.Dispose();
             _debouncer?.Dispose();
             (provider as IDisposable)?.Dispose();

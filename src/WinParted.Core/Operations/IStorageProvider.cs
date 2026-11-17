@@ -35,7 +35,8 @@ public sealed record SupportedSizeRange(ulong Minimum, ulong Maximum);
 /// <param name="Code">The backend's numeric status code, if any.</param>
 /// <param name="Details">Raw technical details for the "Technical details" section.</param>
 /// <param name="Advice">What the user can do, when it's specific to this error; otherwise the generic advice is shown.</param>
-public sealed record StorageError(string Message, bool MayHaveChanged, uint? Code = null, string? Details = null, string? Advice = null);
+/// <param name="Changed">The answer to "Was anything changed?", when it's more specific than yes or no.</param>
+public sealed record StorageError(string Message, bool MayHaveChanged, uint? Code = null, string? Details = null, string? Advice = null, string? Changed = null);
 
 public sealed class StorageOperationException(StorageError error, Exception? inner = null)
     : Exception(error.Message, inner)

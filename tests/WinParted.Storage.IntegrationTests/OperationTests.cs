@@ -288,6 +288,60 @@ public sealed class OperationTests : IDisposable
         Assert.Null((await DataPartition()).DriveLetter);
     }
 
+    // ----- empty-card-reader-slots 3.2 ---------------------------------------------------------
+
+    /// <summary>A second test VHDX whose volume holds the given letter, like another drive would.</summary>
+    private async Task<TestVhd> LetterHolder(char letter)
+    {
+        var holder = TestVhd.Create("letter-holder", 256, _provider);
+        await holder.Execute(s => new InitializeDiskRequest(new DiskTarget(holder.Id), TestVhd.Fingerprint(s, new DiskTarget(holder.Id)), PartitionStyle.Gpt));
+        await holder.Execute(s =>
+        {
+            var target = new UnallocatedTarget(holder.Id, s.FindDisk(holder.Id)!.UnallocatedSegments.First().Offset);
+            return new CreatePartitionRequest(target, TestVhd.Fingerprint(s, target), 100 * MB, new FormatOptions(FileSystemKind.Ntfs, "HOLDER"), letter);
+        });
+        return holder;
+    }
+
+    [AdminFact]
+    public async Task Change_to_a_letter_in_use_fails_with_nothing_changed()
+    {
+        await Initialize(PartitionStyle.Gpt);
+        await Create(100 * MB, new FormatOptions(FileSystemKind.Ntfs, "MINE"));
+        var free = (await _vhd.SnapshotAsync()).Facts.FreeDriveLetters.Reverse().Take(2).ToArray();
+        Assert.True(free.Length == 2, "Needs two free drive letters.");
+        var (mine, taken) = (free[0], free[1]);
+
+        var p = await DataPartition();
+        await _vhd.Execute(s => new SetDriveLetterRequest(Target(p), TestVhd.Fingerprint(s, Target(p)), mine));
+        using var holder = await LetterHolder(taken);
+        Assert.Contains(taken, (await _vhd.SnapshotAsync()).Facts.UsedDriveLetters);
+
+        p = await DataPartition();
+        var ex = await Assert.ThrowsAsync<StorageOperationException>(() =>
+            _vhd.Execute(s => new SetDriveLetterRequest(Target(p), TestVhd.Fingerprint(s, Target(p)), taken)));
+
+        Assert.False(ex.Error.MayHaveChanged);
+        Assert.Equal($"Drive letter {taken}: is already in use by another drive. Nothing was changed. The volume is still {mine}:.", ex.Error.Message);
+        Assert.Equal(mine, (await DataPartition()).DriveLetter);
+    }
+
+    [AdminFact]
+    public async Task Create_with_a_letter_in_use_is_created_without_a_letter()
+    {
+        await Initialize(PartitionStyle.Gpt);
+        var taken = (await _vhd.SnapshotAsync()).Facts.FreeDriveLetters.Last();
+        using var holder = await LetterHolder(taken);
+
+        var ex = await Assert.ThrowsAsync<StorageOperationException>(() =>
+            Create(100 * MB, new FormatOptions(FileSystemKind.Ntfs, "NEW"), taken));
+
+        Assert.True(ex.Error.MayHaveChanged);
+        Assert.StartsWith($"The partition was created and formatted, but drive letter {taken}:", ex.Error.Message, StringComparison.Ordinal);
+        var created = await DataPartition();
+        Assert.Equal("NEW", created.Volume?.Label);
+        Assert.Null(created.DriveLetter);
+    }
     /// <summary>Progress&lt;T&gt; posts asynchronously; tests need the reports collected inline.</summary>
     private sealed class SynchronousProgress(Action<OperationProgress> report) : IProgress<OperationProgress>
     {
